@@ -7,15 +7,21 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
+
 public class ConsultaActivity extends AppCompatActivity {
 
     EditText campo_correo;
+    // Session Manager Class
+    SessionManager session;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta);
-
+        session = new SessionManager(getApplicationContext());
       Button  btnScan = (Button) findViewById(R.id.btnScan);
         campo_correo = (EditText) findViewById(R.id.campo_correo);
         btnScan.setOnClickListener(new View.OnClickListener() {
@@ -25,6 +31,15 @@ public class ConsultaActivity extends AppCompatActivity {
                 ScanEAN();
             }
         });
+
+        Button boton_cancelar = (Button) findViewById(R.id.boton_cancelar);
+        boton_cancelar.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                salir();
+            }
+        });
     }
 
     private void ScanEAN() {
@@ -32,6 +47,12 @@ public class ConsultaActivity extends AppCompatActivity {
         intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
         this.startActivityForResult(intent, 1);
     }
+
+
+    private void salir(){
+        session.logoutUser();
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
