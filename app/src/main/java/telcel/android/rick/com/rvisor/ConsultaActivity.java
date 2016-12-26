@@ -22,6 +22,7 @@ public class ConsultaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta);
         session = new SessionManager(getApplicationContext());
+        session.firstRun();
       Button  btnScan = (Button) findViewById(R.id.btnScan);
         campo_correo = (EditText) findViewById(R.id.campo_correo);
         btnScan.setOnClickListener(new View.OnClickListener() {

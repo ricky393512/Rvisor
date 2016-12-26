@@ -84,6 +84,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             startActivity(intent);
             Log.d("TAG1", "firstRun(false): " + Boolean.valueOf(firstRun).toString());
         } else {
+
+            Log.d("TAG1", "firstRun(true): " + Boolean.valueOf(firstRun).toString());
+
+
+
             // Set up the login form.
             mUsuarioCoppelView = (AutoCompleteTextView) findViewById(R.id.usuarioCoppel);
             populateAutoComplete();
@@ -355,7 +360,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-
+                System.out.println("Entre y guardo");
                 session.createLoginSession("Android Hive", "anroidhive@gmail.com");
                 Intent intent =               new Intent(getApplicationContext(),ConsultaActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
