@@ -3,6 +3,8 @@ package telcel.android.rick.com.rvisor;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +17,34 @@ public class ConsultaActivity extends AppCompatActivity {
     // Session Manager Class
     SessionManager session;
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
+       /* case R.id.add:
+            //add the function to perform here
+            return(true);
+        case R.id.reset:
+            //add the function to perform here
+            return(true);
+        case R.id.about:
+            //add the function to perform here
+            return(true);
+        */
+        case R.id.exit:
+            salir();
+            return(true);
+    }
+        return(super.onOptionsItemSelected(item));
+    }
+
 
 
     @Override
@@ -24,7 +54,18 @@ public class ConsultaActivity extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.firstRun();
       Button  btnScan = (Button) findViewById(R.id.btnScan);
+        Button btnCliente = (Button) findViewById(R.id.btnCliente);
         campo_correo = (EditText) findViewById(R.id.campo_correo);
+
+        btnCliente.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                ScanEAN();
+            }
+        });
+
+
         btnScan.setOnClickListener(new View.OnClickListener() {
 
             @Override
