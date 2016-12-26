@@ -20,10 +20,9 @@ tools:showIn="@layout/activity_consulta">
     android:orientation="horizontal">
 
 
-    <Button android:id="@+id/btnCliente"
-        android:drawableLeft="@drawable/ic_cliente"
-
-        android:layout_width="wrap_content"
+    <Button android:id="@+id/btnImei"
+        android:drawableLeft="@drawable/ic_telefono"
+        android:layout_width="52dp"
         android:layout_height="wrap_content" />
 
     <android.support.design.widget.TextInputLayout
@@ -33,7 +32,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_marginLeft="32dp">
 
         <EditText
-            android:id="@+id/campo_nombre"
+            android:id="@+id/campo_imei"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -55,7 +54,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_telefono" />
+        android:src="@drawable/ic_bar_code" />
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/til_telefono"

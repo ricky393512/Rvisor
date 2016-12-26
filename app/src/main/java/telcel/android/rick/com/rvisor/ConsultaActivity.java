@@ -13,7 +13,8 @@ import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.Ses
 
 public class ConsultaActivity extends AppCompatActivity {
 
-    EditText campo_correo;
+    EditText campo_imei;
+
     // Session Manager Class
     SessionManager session;
 
@@ -45,7 +46,19 @@ public class ConsultaActivity extends AppCompatActivity {
         return(super.onOptionsItemSelected(item));
     }
 
+    @Override
+    public void onBackPressed() {
+     /*   DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
 
+*/
+        moveTaskToBack(true);
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,10 +67,10 @@ public class ConsultaActivity extends AppCompatActivity {
         session = new SessionManager(getApplicationContext());
         session.firstRun();
       Button  btnScan = (Button) findViewById(R.id.btnScan);
-        Button btnCliente = (Button) findViewById(R.id.btnCliente);
-        campo_correo = (EditText) findViewById(R.id.campo_correo);
+        Button btnImei = (Button) findViewById(R.id.btnImei);
+        campo_imei = (EditText) findViewById(R.id.campo_imei);
 
-        btnCliente.setOnClickListener(new View.OnClickListener() {
+        btnImei.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -86,7 +99,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
     private void ScanEAN() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-        intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
+        intent.putExtra("SCAN_MODE", "PDF_417");
         this.startActivityForResult(intent, 1);
     }
 
@@ -100,7 +113,7 @@ public class ConsultaActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            campo_correo.setText(data.getStringExtra("SCAN_RESULT"));
+            campo_imei.setText(data.getStringExtra("SCAN_RESULT"));
             // En asyncTask
             // ISBN.callISBNService();
          /*   if (pref.getBoolean("checkServer", true)) { // Sensores

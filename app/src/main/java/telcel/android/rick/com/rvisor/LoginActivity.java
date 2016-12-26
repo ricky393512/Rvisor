@@ -57,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * TODO: remove after connecting to a real authentication system.
      */
     private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world", "28709:berenice"
+            "foo@example.com:hello", "bar@example.com:world", "28709:123"
     };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
@@ -184,8 +184,49 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         boolean cancel = false;
         View focusView = null;
 
+        if (TextUtils.isEmpty(usuario)) {
+            mUsuarioCoppelView.setError("La clave de vendedor no debe estar vacia");
+            focusView = mUsuarioCoppelView;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError("La clave de distribuidor no debe estar vacia");
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+
+        if (!isDigitValid(usuario)) {
+            mUsuarioCoppelView.setError("La clave de vendedor deben ser digitos");
+            focusView = mUsuarioCoppelView;
+            cancel = true;
+        }
+
+
+        if (!isDigitValid(password)) {
+            mPasswordView.setError("La clave de distribuidor deben ser digitos");
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+
+        if (isLongitudValid(usuario)) {
+            mUsuarioCoppelView.setError("La clave de vendedor deben ser menor a 5 digitos");
+            focusView = mUsuarioCoppelView;
+            cancel = true;
+        }
+
+        if (isLongitudValid(password)) {
+            mPasswordView.setError("La clave de distribuidor deben ser menor a 5 digitos");
+            focusView = mPasswordView;
+            cancel = true;
+        }
+
+
+
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+      /*  if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -197,6 +238,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             focusView = mUsuarioCoppelView;
             cancel = true;
         }
+        */
+
         /*
         else if (!isEmailValid(usuario)) {
             mUsuarioCoppelView.setError(getString(R.string.error_invalid_usuario));
@@ -204,6 +247,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 */
+
+
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -217,14 +263,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    private boolean isDigitValid(String clave){
+        return TextUtils.isDigitsOnly(clave);
+    }
+
     private boolean isEmailValid(String email) {
         //TODO: Replace this with your own logic
         return email.contains("@");
     }
 
-    private boolean isPasswordValid(String password) {
+    private boolean isLongitudValid(String clave) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return clave.length() > 5;
     }
 
     /**
