@@ -218,7 +218,7 @@ tools:showIn="@layout/activity_consulta">
     android:orientation="horizontal">
 
     <Button
-        android:id="@+id/btnScan"
+        android:id="@+id/btnNueva"
         style="@style/Widget.AppCompat.Button.Borderless.Colored"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

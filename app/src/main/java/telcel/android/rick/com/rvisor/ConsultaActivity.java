@@ -2,7 +2,6 @@ package telcel.android.rick.com.rvisor;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -30,6 +29,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
     EditText campo_imei;
     EditText campo_iccid;
+    EditText campo_codigo_ciudad;
     TextView txtClaveDistribuidor,txtClaveVendedor,txtResultado;
     // Session Manager Class
     SessionManager session;
@@ -86,13 +86,28 @@ public class ConsultaActivity extends AppCompatActivity {
         Button  btnIccid = (Button) findViewById(R.id.btnIccid);
         Button btnImei = (Button) findViewById(R.id.btnImei);
         Button btnActivar= (Button) findViewById(R.id.boton_aceptar);
+        Button btnNueva= (Button) findViewById(R.id.btnNueva);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        /*KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
 
+        KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
+        KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
+        lock.disableKeyguard();
+
+        lock.disableKeyguard();
+
+        KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
+        KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
+
+         lock.reenableKeyguard();
+*/
         campo_imei = (EditText) findViewById(R.id.campo_imei);
-
         campo_iccid = (EditText) findViewById(R.id.campo_iccid);
+        campo_codigo_ciudad = (EditText) findViewById(R.id.campo_ciudad);
         txtResultado = (TextView) findViewById(R.id.txtResultado);
+
         try{
 
         Credencial credencial = (Credencial)getIntent().getExtras().getSerializable("credencial");
@@ -110,11 +125,20 @@ public class ConsultaActivity extends AppCompatActivity {
         }
 
 
+        btnNueva.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                limpiaPantalla();
+            }
+        });
+
+
         btnActivar.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                notification4(1, R.drawable.ic_telefono,"Aviso"," 2222222222");
+               notification4(1, R.drawable.ic_telefono,"Aviso"," 2222222222");
                 txtResultado.setText("El numero es 222222222");
             }
         });
@@ -170,6 +194,15 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    private void limpiaPantalla(){
+
+        campo_imei.setText(null);
+        campo_iccid.setText(null);
+        campo_codigo_ciudad.setText(null);
+        txtResultado.setText(null);
+
+    }
+
 
     private void salir(){
         session.logoutUser();
@@ -220,7 +253,7 @@ public class ConsultaActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         // Crear pending intent
-        PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
+     /*   PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
                 this,
                 0,
                 intent,
@@ -228,7 +261,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
         // Asignar intent y establecer true para notificar como aviso
         builder.setFullScreenIntent(fullScreenPendingIntent, true);
-
+*/
 
 // API 11 o mayor
         builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
