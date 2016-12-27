@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -29,7 +30,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
     EditText campo_imei;
     EditText campo_iccid;
-    TextView txtClaveDistribuidor,txtClaveVendedor;
+    TextView txtClaveDistribuidor,txtClaveVendedor,txtResultado;
     // Session Manager Class
     SessionManager session;
     private NotificationManager notifyMgr;
@@ -86,10 +87,12 @@ public class ConsultaActivity extends AppCompatActivity {
         Button btnImei = (Button) findViewById(R.id.btnImei);
         Button btnActivar= (Button) findViewById(R.id.boton_aceptar);
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
         campo_imei = (EditText) findViewById(R.id.campo_imei);
 
         campo_iccid = (EditText) findViewById(R.id.campo_iccid);
-
+        txtResultado = (TextView) findViewById(R.id.txtResultado);
         try{
 
         Credencial credencial = (Credencial)getIntent().getExtras().getSerializable("credencial");
@@ -112,6 +115,7 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 notification4(1, R.drawable.ic_telefono,"Aviso"," 2222222222");
+                txtResultado.setText("El numero es 222222222");
             }
         });
 

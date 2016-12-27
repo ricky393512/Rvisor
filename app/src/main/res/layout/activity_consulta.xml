@@ -29,8 +29,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content"
             android:text="Clave Vendedor"
             android:layout_gravity="left"
-            android:background="#880037ff"
-            android:textColor="#ffffff"
+
             />
 
         <TextView
@@ -40,8 +39,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content"
             android:text="456546546"
             android:layout_gravity="right"
-            android:background="#880037ff"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorAccent"
             />
 
         <TextView
@@ -51,8 +49,6 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content"
             android:text="Clave Distribuidor"
             android:layout_gravity="left"
-            android:background="#880037ff"
-            android:textColor="#ffffff"
             />
 
         <TextView
@@ -62,8 +58,8 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content"
             android:text="456546546"
             android:layout_gravity="right"
-            android:background="#880037ff"
-            android:textColor="#ffffff"
+            android:textColor="@color/colorAccent"
+
             />
 
     </TableRow>
@@ -183,6 +179,28 @@ tools:showIn="@layout/activity_consulta">
             android:layout_marginLeft="32dp"
             />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtTituloComentario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/area_producto"
+        android:text="Resultado"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        />
+
+
+    <TextView
+        android:id="@+id/txtResultado"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtTituloComentario"
+        android:hint="Aparecera el resultado"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/colorAccent"
+
+        />
+
 
 
 
