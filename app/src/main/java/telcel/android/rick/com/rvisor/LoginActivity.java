@@ -32,6 +32,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import telcel.android.rick.com.rvisor.pojo.Credencial;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 
 import static android.Manifest.permission.READ_CONTACTS;
@@ -412,7 +413,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (success) {
                 System.out.println("Entre y guardo");
                 session.createLoginSession("Android Hive", "anroidhive@gmail.com");
+                // Store values at the time of the login attempt.
+                String vendedor = mUsuarioCoppelView.getText().toString();
+                String distribuidor = mPasswordView.getText().toString();
+                Credencial credencial = new Credencial();
+
+                credencial.setClaveVendedor(vendedor);
+                credencial.setClaveDistribuidor(distribuidor);
+
                 Intent intent =               new Intent(getApplicationContext(),ConsultaActivity.class);
+                intent.putExtra("credencial", credencial);
+
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();

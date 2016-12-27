@@ -19,7 +19,7 @@
     <string name="hint_correo">Tipo de Activación:</string>
     <string name="hint_codigo_ciudad">Codigo Ciudad:</string>
     <string name="accion_cancelar">Cancelar</string>
-    <string name="accion_aceptar">Aceptar</string>
-    <string name="accion_escanear">Escanear</string>
+    <string name="accion_aceptar">Activar</string>
+    <string name="accion_nueva">Nueva</string>
 
 </resources>
