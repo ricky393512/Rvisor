@@ -92,10 +92,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
             // Set up the login form.
-            mUsuarioCoppelView = (AutoCompleteTextView) findViewById(R.id.usuarioCoppel);
+            mUsuarioCoppelView = (AutoCompleteTextView) findViewById(R.id.distribuidor);
             populateAutoComplete();
 
-            mPasswordView = (EditText) findViewById(R.id.password);
+            mPasswordView = (EditText) findViewById(R.id.vendedor);
             mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
                 @Override
                 public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -180,8 +180,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String usuario = mUsuarioCoppelView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String usuario = mPasswordView.getText().toString();
+        String password = mUsuarioCoppelView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -415,8 +415,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 System.out.println("Entre y guardo");
                 session.createLoginSession("Android Hive", "anroidhive@gmail.com");
                 // Store values at the time of the login attempt.
-                String vendedor = mUsuarioCoppelView.getText().toString();
-                String distribuidor = mPasswordView.getText().toString();
+
+                String vendedor = mPasswordView.getText().toString();
+                String distribuidor = mUsuarioCoppelView.getText().toString();
+
+
                 Credencial credencial = new Credencial();
 
                 credencial.setClaveVendedor(vendedor);

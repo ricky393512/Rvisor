@@ -23,26 +23,6 @@ tools:showIn="@layout/activity_consulta">
 
 
         <TextView
-            android:id="@+id/textView1"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Clave Vendedor"
-            android:layout_gravity="left"
-
-            />
-
-        <TextView
-            android:id="@+id/txtClaveVendedor"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="456546546"
-            android:layout_gravity="right"
-            android:textColor="@color/colorAccent"
-            />
-
-        <TextView
             android:id="@+id/textView11"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -62,8 +42,29 @@ tools:showIn="@layout/activity_consulta">
 
             />
 
-    </TableRow>
 
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Clave Vendedor"
+            android:layout_gravity="left"
+
+            />
+
+        <TextView
+            android:id="@+id/txtClaveVendedor"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="456546546"
+            android:layout_gravity="right"
+            android:textColor="@color/colorAccent"
+            />
+
+
+    </TableRow>
 
 
 
@@ -72,7 +73,7 @@ tools:showIn="@layout/activity_consulta">
     android:layout_below="@+id/area_tabla"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
+        android:layout_marginTop="20dp"
     android:orientation="horizontal">
 
     <Button android:id="@+id/btnIccid"
@@ -124,7 +125,7 @@ tools:showIn="@layout/activity_consulta">
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="@string/hint_nombre"
-                android:inputType="text"
+                android:inputType="phone"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>
@@ -186,6 +187,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_height="wrap_content"
         android:layout_below="@id/area_producto"
         android:text="Resultado"
+        android:layout_marginTop="30dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
 
@@ -198,7 +200,7 @@ tools:showIn="@layout/activity_consulta">
         android:hint="Aparecera el resultado"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/colorAccent"
-
+        android:layout_marginTop="20dp"
         />
 
 
