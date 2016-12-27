@@ -5,18 +5,18 @@ package telcel.android.rick.com.rvisor.pojo;
  */
 public class TipoProducto {
 
-    private int id;
+    private String id;
     private String nombre;
 
 
     public TipoProducto() {
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
