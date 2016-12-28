@@ -8,8 +8,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -34,10 +32,22 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     private TextView txtResultado;
     private List<TipoProducto> listaProductos;
     private Spinner mySpinner;
+    final String NAMESPACE = "http://hello_webservice/";
+    final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
+    final String METHOD_NAME = "getProductos";
+    final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/getProductos";
 
     public CoopelWS(Context context, Spinner mySpinner){
         this.context=context;
         this.mySpinner = mySpinner;
+
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+
+
 
     }
 
@@ -50,13 +60,10 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
 
             listaProductos = new ArrayList<TipoProducto>();
-        final String NAMESPACE = "http://hello_webservice/";
-        final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
-        final String METHOD_NAME = "getProductos";
-        final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/getProductos";
 
         if (!isAvailableWSDL(URL)) {
             System.out.println("NO esta arriba");
+
             return false;
         }
 
@@ -101,11 +108,8 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
       //  SoapObject resSoap= (SoapObject) response;
         TipoProducto[] listaP = null;
-try {
      listaP = new TipoProducto[resSoap.getPropertyCount()];
-}catch (NullPointerException e){
-    return false;
-}
+
         for (int i = 0; i < listaP.length; i++)
         {
             SoapObject ic = (SoapObject)resSoap.getProperty(i);
@@ -185,13 +189,21 @@ try {
             return false;
         }
 */
-        return false;
+        return true;
     }
+
 
     @Override
     protected void onPostExecute(final Boolean success) {
         if(success==false){
             Toast.makeText(context, "Usuario No Valido", Toast.LENGTH_LONG).show();
+
+
+            if (!isAvailableWSDL(URL)) {
+                System.out.println("NO esta arriba");
+            //    mostrarAlerta();
+           //     return false;
+            }
 
             ArrayList<TipoProducto> productos = new ArrayList<TipoProducto>();
             // you can use this array to find the school ID based on name
@@ -244,7 +256,10 @@ try {
             }
 
 
-            mySpinner.setAdapter(new ArrayAdapter<String>(context, R.layout.spinner_style, nombreProductos));
+            ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, listaProductos);
+            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+            mySpinner.setAdapter(adapter);
+            //mySpinner.setAdapter(new ArrayAdapter<String>(context, R.layout.spinner_style, nombreProductos));
 
 
 

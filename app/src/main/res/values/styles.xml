@@ -15,4 +15,9 @@
     <style name="spinnerItemStyle" parent="android:Widget.TextView.SpinnerItem">
 
     </style>
+
+    <style name="myDialog" parent="Theme.AppCompat">
+        <item name="android:windowNoTitle">true</item>
+        ...
+    </style>
 </resources>
