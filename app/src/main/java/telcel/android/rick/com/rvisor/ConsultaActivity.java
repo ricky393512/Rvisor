@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -24,6 +23,7 @@ import java.util.ArrayList;
 import telcel.android.rick.com.rvisor.pojo.Credencial;
 import telcel.android.rick.com.rvisor.pojo.TipoProducto;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
+import telcel.android.rick.com.rvisor.ws.CoopelWS;
 
 public class ConsultaActivity extends AppCompatActivity {
 
@@ -31,6 +31,7 @@ public class ConsultaActivity extends AppCompatActivity {
     EditText campo_iccid;
     EditText campo_codigo_ciudad;
     TextView txtClaveDistribuidor,txtClaveVendedor,txtResultado;
+    CoopelWS coopelWS=null;
     // Session Manager Class
     SessionManager session;
     private NotificationManager notifyMgr;
@@ -173,8 +174,9 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
         Spinner mySpinner = (Spinner)findViewById(R.id.my_spinner);
-        mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
-
+      //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
+        coopelWS = new CoopelWS(getApplicationContext(),mySpinner);
+        coopelWS.execute();
     }
 
     private void ScanEAN() {

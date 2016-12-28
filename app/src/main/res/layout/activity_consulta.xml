@@ -176,8 +176,8 @@ tools:showIn="@layout/activity_consulta">
             android:id="@+id/my_spinner"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:ems="10"
             android:layout_marginLeft="32dp"
+            android:textColor="@color/colorAccent"
             />
     </LinearLayout>
 
