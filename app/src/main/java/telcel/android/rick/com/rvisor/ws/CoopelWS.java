@@ -8,6 +8,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -15,6 +17,8 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +46,19 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 // TODO: attempt authentication against a network service.
 //WebService - Opciones
 
-        listaProductos = new ArrayList<TipoProducto>();
+
+
+
+            listaProductos = new ArrayList<TipoProducto>();
         final String NAMESPACE = "http://hello_webservice/";
         final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
         final String METHOD_NAME = "getProductos";
         final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/getProductos";
 
+        if (!isAvailableWSDL(URL)) {
+            System.out.println("NO esta arriba");
+            return false;
+        }
 
         // Create the outgoing message
         SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
@@ -249,6 +260,30 @@ try {
         Toast.makeText(context, "Error", Toast.LENGTH_LONG).show();
     }
 
+
+    public boolean isAvailableWSDL(String url) {
+        HttpURLConnection c = null;
+        try {
+            URL siteURL = new URL(url);
+            c = (HttpURLConnection) siteURL
+                    .openConnection();
+            c.setRequestMethod("HEAD");
+            c.setConnectTimeout(1000); //set timeout to 5 seconds
+            c.setReadTimeout(1000);
+            c.connect();
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (c != null) {
+                c.disconnect();
+                c=null;
+            }
+        }
+
+    }
 
 
 
