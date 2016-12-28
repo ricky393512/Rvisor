@@ -186,7 +186,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/area_producto"
-        android:text="Resultado"
+        android:text=" "
         android:layout_marginTop="30dp"
         android:textAppearance="?android:attr/textAppearanceLarge"
         />
@@ -197,7 +197,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtTituloComentario"
-        android:hint="Aparecera el resultado"
+        android:hint=" "
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/colorAccent"
         android:layout_marginTop="20dp"
