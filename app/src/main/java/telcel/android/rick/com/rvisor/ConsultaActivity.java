@@ -139,8 +139,10 @@ public class ConsultaActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
+                // And to get the actual User object that was selected, you can do this.
+                TipoProducto tipoProducto = (TipoProducto) ( (Spinner) findViewById(R.id.my_spinner) ).getSelectedItem();
                notification4(1, R.drawable.ic_telefono,"Aviso"," 2222222222");
-                txtResultado.setText("El numero es 222222222");
+                txtResultado.setText("El numero es 222222222   ---"+tipoProducto.getNombre() );
             }
         });
 

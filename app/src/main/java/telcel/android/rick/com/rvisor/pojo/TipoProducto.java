@@ -27,4 +27,9 @@ public class TipoProducto {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    @Override
+    public String toString() {
+        return this.nombre;            // What to display in the Spinner list.
+    }
 }

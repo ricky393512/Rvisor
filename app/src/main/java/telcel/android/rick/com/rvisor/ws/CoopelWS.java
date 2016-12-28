@@ -41,6 +41,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... params) {
 // TODO: attempt authentication against a network service.
 //WebService - Opciones
+
         listaProductos = new ArrayList<TipoProducto>();
         final String NAMESPACE = "http://hello_webservice/";
         final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
@@ -173,7 +174,7 @@ try {
             return false;
         }
 */
-        return true;
+        return false;
     }
 
     @Override
@@ -204,7 +205,18 @@ try {
             nombreProductos.add(0,"Productyo 2");
             nombreProductos.add(0,"Productyo 3");
 
-            ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, nombreProductos);
+            List<TipoProducto> listTP = new ArrayList<>();
+            TipoProducto tp1 = new TipoProducto();
+            TipoProducto tp2 = new TipoProducto();
+            tp1.setId("1");
+            tp1.setNombre("R1");
+            tp2.setId("2");
+            tp2.setNombre("R2");
+
+            listTP.add(tp1);
+            listTP.add(tp2);
+
+            ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, listTP);
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mySpinner.setAdapter(adapter);
 //              mySpinner.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, nombreProductos));

@@ -36,7 +36,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="456546546"
+            android:text=""
             android:layout_gravity="right"
             android:textColor="@color/colorAccent"
 
@@ -58,7 +58,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="456546546"
+            android:text=""
             android:layout_gravity="right"
             android:textColor="@color/colorAccent"
             />
