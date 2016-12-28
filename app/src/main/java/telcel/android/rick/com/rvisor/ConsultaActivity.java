@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
@@ -105,6 +107,8 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
     public void  realizaActivacion(){
+
+        //TODO Validaciones
         TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
         final Activacion activacion = new Activacion();
         activacion.setImei(campo_imei.getText().toString());
@@ -121,6 +125,8 @@ public class ConsultaActivity extends AppCompatActivity {
             final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
             final String METHOD_NAME = "activaTelefono";
             final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/activaTelefono";
+            String codigoAct;
+            String mensajeAct;
 
 
 
@@ -179,15 +185,38 @@ public class ConsultaActivity extends AppCompatActivity {
 
                 SoapObject resSoap = (SoapObject) envelope.bodyIn;
 
-                List<SoapObject> result = new ArrayList<SoapObject>();
-                if (resSoap != null) {
-                    SoapObject list = ((SoapObject) resSoap);
 
-                    for(int i=0; i<list.getPropertyCount(); i++) {
-                        SoapObject item = (SoapObject)list.getProperty(i);
-                        result.add(item);
+                if (resSoap != null) {
+
+                    SoapObject soapResult = (SoapObject)resSoap.getProperty(0);
+                    Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
+                    SoapPrimitive  codigo=    (SoapPrimitive) soapResult.getProperty(0);
+                    SoapPrimitive  mensaje=    (SoapPrimitive) soapResult.getProperty(1);
+
+                    codigoAct = codigo.toString();
+                    mensajeAct= mensaje.toString();
+
+                 /*   for(int i=0;i<soapResult.getPropertyCount();i++)
+                    {
+                        String result = null;
+                        SoapPrimitive so =null;
+                        try {
+                            so=    (SoapPrimitive) soapResult.getProperty(i);
+
+                            result = so.toString();
+                        }catch(java.lang.ClassCastException e){
+                            Log.i("Error falta un campo: ",e.getMessage());
+                            continue;
+                        }
+
+                        Log.i("Resultado S: ",result);
+
                     }
+                   */
                 }
+
+
+
 
 
 
@@ -200,12 +229,27 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(final Boolean success) {
                 if(success==false){
-                    Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
+                 ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
 
 
                 }
                 else{
-                    Toast.makeText(ConsultaActivity.this, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
+                   // Toast.makeText(ConsultaActivity.this, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
+                    alert.setTitle("Atención");
+                    alert.setMessage("Se ha realizado la activacion correctamente \n"
+                            +mensajeAct
+
+                            + "\n");
+                    alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                        }
+                    });
+                    AlertDialog dialog = alert.create();
+                    dialog.show();
                 }
 
 
