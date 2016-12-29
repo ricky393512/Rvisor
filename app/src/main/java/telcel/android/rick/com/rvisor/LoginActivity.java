@@ -4,17 +4,22 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -28,6 +33,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +60,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private SessionManager session;
 
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -74,6 +85,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Session class instance
+
+
         session = new SessionManager(getApplicationContext());
         boolean firstRun = session.isFirstRun();
 
@@ -135,6 +148,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        estaConectado();
         if (mAuthTask != null) {
             return;
         }
@@ -191,31 +205,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
 
 
-        // Check for a valid password, if the user entered one.
-      /*  if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            mPasswordView.setError(getString(R.string.error_invalid_password));
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-        // Check for a valid email address.
-        if (TextUtils.isEmpty(usuario)) {
-            mUsuarioCoppelView.setError(getString(R.string.error_field_required));
-            focusView = mUsuarioCoppelView;
-            cancel = true;
-        }
-        */
-
-        /*
-        else if (!isEmailValid(usuario)) {
-            mUsuarioCoppelView.setError(getString(R.string.error_invalid_usuario));
-            focusView = mUsuarioCoppelView;
-            cancel = true;
-        }
-*/
-
-
-
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -233,10 +222,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         return TextUtils.isDigitsOnly(clave);
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
 
     private boolean isLongitudValid(String clave) {
         //TODO: Replace this with your own logic
@@ -338,19 +323,24 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
+        final String NAMESPACE = "http://ws.telcel.com/";
+        final String URL="http://www.r7.telcel.com/activaciones_mobile_ws/activacionMobileWS?wsdl";
+        final String METHOD_NAME = "realiza_autenticacion";
+        final String SOAP_ACTION = "http://ws.telcel.com/realiza_autenticacion";
+        private final String distribuidor=null;
+        private final String vendedor=null;
 
-        private final String mEmail;
-        private final String mPassword;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        UserLoginTask(String distribuidor, String vendedor) {
+            distribuidor = distribuidor;
+            vendedor = vendedor;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
+            /*
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
@@ -366,7 +356,82 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            // TODO: register the new account here.
+            */
+
+            if (!isAvailableWSDL(URL)) {
+                System.out.println("NO esta arriba LOGin WSSSSSSSSSSSSSS");
+
+                return false;
+            }
+
+            // Create the outgoing message
+            SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
+
+            // Set Parameter
+            System.out.println("cod_distribuidor "+distribuidor);
+            requestObject.addProperty("cod_distribuidor","1222");
+
+            System.out.println("cod_vendedor "+vendedor);
+            requestObject.addProperty("cod_vendedor","32323");
+
+
+
+            // Create soap envelop .use version 1.1 of soap
+            SoapSerializationEnvelope envelope =
+                    new SoapSerializationEnvelope(SoapEnvelope.VER11);
+
+            // add the outgoing object as the request
+            envelope.setOutputSoapObject(requestObject);
+            //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
+            HttpTransportSE ht = new HttpTransportSE(URL);
+            ht.debug = true;
+            // call and Parse Result.
+
+            try {
+                ht.call(SOAP_ACTION, envelope);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (XmlPullParserException e) {
+                e.printStackTrace();
+            }
+            //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
+
+            SoapObject resSoap = (SoapObject) envelope.bodyIn;
+
+
+            if (resSoap != null) {
+
+                SoapObject soapResult = (SoapObject)resSoap.getProperty(0);
+                Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
+                SoapPrimitive codigo=    (SoapPrimitive) soapResult.getProperty(0);
+                SoapPrimitive  mensaje=    (SoapPrimitive) soapResult.getProperty(1);
+
+             //   codigoAct = codigo.toString();
+             //   mensajeAct= mensaje.toString();
+
+                 /*   for(int i=0;i<soapResult.getPropertyCount();i++)
+                    {
+                        String result = null;
+                        SoapPrimitive so =null;
+                        try {
+                            so=    (SoapPrimitive) soapResult.getProperty(i);
+
+                            result = so.toString();
+                        }catch(java.lang.ClassCastException e){
+                            Log.i("Error falta un campo: ",e.getMessage());
+                            continue;
+                        }
+
+                        Log.i("Resultado S: ",result);
+
+                    }
+                   */
+            }
+
+
+
+
+
             return true;
         }
 
@@ -408,5 +473,95 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
         }
     }
+
+
+
+    protected Boolean estaConectado(){
+        if(conectadoWifi()){
+          //  showAlertDialog(LoginActivity.this, "Conexion a Internet",
+              //      "Tu Dispositivo tiene Conexion a Wifi.", true);
+            return true;
+        }else{
+            if(conectadoRedMovil()){
+            //    showAlertDialog(LoginActivity.this, "Conexion a Internet",
+                //        "Tu Dispositivo tiene Conexion Movil.", true);
+                return true;
+            }else{
+                showAlertDialog(LoginActivity.this, "Conexion a Internet",
+                        "Tu Dispositivo no tiene Conexion a Internet.", false);
+                return false;
+            }
+        }
+    }
+
+    protected Boolean conectadoWifi(){
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (info != null) {
+                if (info.isConnected()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected Boolean conectadoRedMovil(){
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (info != null) {
+                if (info.isConnected()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void showAlertDialog(Context context, String title, String message, Boolean status) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this,R.style.myDialog);
+        alert.setTitle(title);
+        alert.setMessage(message+ "\n"
+                );
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+               // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
+                startActivity(getIntent());
+            }
+        });
+        AlertDialog dialog = alert.create();
+        dialog.show();
+    }
+
+
+    public boolean isAvailableWSDL(String url) {
+        HttpURLConnection c = null;
+        try {
+            URL siteURL = new URL(url);
+            c = (HttpURLConnection) siteURL
+                    .openConnection();
+            c.setRequestMethod("HEAD");
+            c.setConnectTimeout(1000); //set timeout to 5 seconds
+            c.setReadTimeout(1000);
+            c.connect();
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        } finally {
+            if (c != null) {
+                c.disconnect();
+                c = null;
+            }
+        }
+
+    }
+
+
 }
 

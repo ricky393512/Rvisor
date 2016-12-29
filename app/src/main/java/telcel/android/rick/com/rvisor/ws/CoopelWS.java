@@ -205,41 +205,17 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
            //     return false;
             }
 
-            ArrayList<TipoProducto> productos = new ArrayList<TipoProducto>();
-            // you can use this array to find the school ID based on name
-            ArrayList<String> nombreProductos = new ArrayList<String>();
 
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
-            nombreProductos.add(0,"Productyo 1");
-            nombreProductos.add(0,"Productyo 2");
-            nombreProductos.add(0,"Productyo 3");
 
             List<TipoProducto> listTP = new ArrayList<>();
             TipoProducto tp1 = new TipoProducto();
-            TipoProducto tp2 = new TipoProducto();
-            tp1.setId("1");
-            tp1.setNombre("R1");
-            tp2.setId("2");
-            tp2.setNombre("R2");
+
+            tp1.setId("");
+            tp1.setNombre("NO DISPONIBLE");
 
             listTP.add(tp1);
-            listTP.add(tp2);
 
-            ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, listTP);
+            ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row,  listTP);
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mySpinner.setAdapter(adapter);
 //              mySpinner.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, nombreProductos));

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -109,12 +110,65 @@ public class ConsultaActivity extends AppCompatActivity {
     public void  realizaActivacion(){
 
         //TODO Validaciones
+
+        System.out.println("Realizadooooooooooooooooooo Validacobes");
         TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+
+
+        View focusView = null;
+        boolean cancel = false;
+        String imei =campo_imei.getText().toString();
+        String iccid =campo_iccid.getText().toString();
+
+        if (TextUtils.isEmpty(imei)) {
+            campo_imei.setError("Debes ingresar un imei");
+            focusView = campo_imei;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(campo_iccid.getText().toString())) {
+            campo_iccid.setError("Debes ingresar un iccid");
+            focusView = campo_iccid;
+            cancel = true;
+        }
+
+        if (TextUtils.isEmpty(campo_codigo_ciudad.getText().toString().trim())) {
+            campo_codigo_ciudad.setError("Debes ingresar un iccid");
+            focusView = campo_codigo_ciudad;
+            cancel = true;
+        }
+
+
+        if (cancel) {
+            // There was an error; don't attempt login and focus the first
+            // form field with an error.
+            focusView.requestFocus();
+        }
+
+
+
         final Activacion activacion = new Activacion();
         activacion.setImei(campo_imei.getText().toString());
         activacion.setIccid(campo_iccid.getText().toString());
+
+        try{
         activacion.setCodigoCiudad(Integer.parseInt(campo_codigo_ciudad.getText().toString()));
-        activacion.setProducto(tipoProducto.getId());
+        }catch(NumberFormatException e){
+            campo_codigo_ciudad.setError("Debes ingresar un codigo de ciudad");
+            campo_codigo_ciudad.requestFocus();
+        }
+
+        try {
+            activacion.setProducto(tipoProducto.getId());
+        }catch(NullPointerException e){
+           Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
+
+            TextView errorText = (TextView)mySpinner.getSelectedView();
+            errorText.setError("Debes seleccionar un producto");
+            errorText.setTextColor(Color.RED);//just to highlight that this is an error
+            errorText.setText("Debes seleccionar un producto");//changes the selected item text to this
+            errorText.requestFocus();
+        }
 
 
         new AsyncTask<Void, Void, Boolean>() {
@@ -280,6 +334,7 @@ public class ConsultaActivity extends AppCompatActivity {
         Button btnImei = (Button) findViewById(R.id.btnImei);
         Button btnActivar = (Button) findViewById(R.id.boton_aceptar);
         Button btnNueva = (Button) findViewById(R.id.btnNueva);
+        Button btnProducto = (Button) findViewById(R.id.btnProducto);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         /*KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
@@ -317,6 +372,13 @@ public class ConsultaActivity extends AppCompatActivity {
 
         }
 
+        btnProducto.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                cargaCatalogoProductos();
+            }
+        });
 
         btnNueva.setOnClickListener(new View.OnClickListener() {
 
@@ -332,10 +394,11 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // And to get the actual User object that was selected, you can do this.
-                TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+                //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+                realizaActivacion();
+
                 notification4(1, R.drawable.ic_telefono, "Aviso", " 2222222222");
             //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
-                realizaActivacion();
 
 
 
@@ -360,16 +423,6 @@ public class ConsultaActivity extends AppCompatActivity {
         });
 
 
-        // you can use this array to find the school ID based on name
-        ArrayList<TipoProducto> productos = new ArrayList<TipoProducto>();
-        // you can use this array to find the school ID based on name
-        ArrayList<String> nombreProductos = new ArrayList<String>();
-
-        nombreProductos.add(0, "Productyo 1");
-        nombreProductos.add(0, "Productyo 2");
-        nombreProductos.add(0, "Productyo 3");
-
-
 
         new AsyncTask<String, Void, Boolean>() {
             @Override
@@ -390,7 +443,9 @@ public class ConsultaActivity extends AppCompatActivity {
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                         //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                            finish();
+                            startActivity(getIntent());
                         }
                     });
                     AlertDialog dialog = alert.create();
@@ -410,6 +465,47 @@ public class ConsultaActivity extends AppCompatActivity {
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+    }
+
+    private void cargaCatalogoProductos(){
+        new AsyncTask<String, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(String... params) {
+                //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
+                boolean valor = isAvailableWSDL(URL);
+                return valor ;
+            }
+
+            @Override
+            protected void onPostExecute(Boolean result) {
+                // progress.dismiss();
+                if(!result){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
+                    alert.setTitle("Atención");
+                    alert.setMessage("El WS de catalogos no esta disponible \n"
+                            + "Favor de comunicarse con el area comercial\n");
+                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                          //  startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                            finish();
+                            startActivity(getIntent());
+                        }
+                    });
+                    AlertDialog dialog = alert.create();
+                    dialog.show();
+                }else{
+
+                }
+            }
+        }.execute("");
+
+
+        Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
+        //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
+        coopelWS = new CoopelWS(getApplicationContext(), mySpinner);
+        coopelWS.execute();
+
     }
 
     private void ScanEAN() {
