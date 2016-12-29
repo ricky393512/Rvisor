@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -382,6 +383,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             // add the outgoing object as the request
             envelope.setOutputSoapObject(requestObject);
+            envelope.dotNet = true;
             //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
             HttpTransportSE ht = new HttpTransportSE(URL);
             ht.debug = true;
@@ -395,11 +397,17 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 e.printStackTrace();
             }
             //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
+          //  Log.e("Object response", response.toString());
+           // SoapObject resSoap = (SoapObject) envelope.bodyIn;
+            Object response =null;
+            try {
+                 response = envelope.getResponse();
+                Log.e("Object response", response.toString());
+            } catch (SoapFault soapFault) {
+                soapFault.printStackTrace();
+            }
 
-            SoapObject resSoap = (SoapObject) envelope.bodyIn;
-
-
-            if (resSoap != null) {
+          /*  if (resSoap != null) {
 
                 SoapObject soapResult = (SoapObject)resSoap.getProperty(0);
                 Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
@@ -426,7 +434,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
                     }
                    */
-            }
+//            }
 
 
 
