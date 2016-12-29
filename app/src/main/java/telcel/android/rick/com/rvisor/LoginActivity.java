@@ -3,38 +3,26 @@ package telcel.android.rick.com.rvisor;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
-import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import org.ksoap2.SoapEnvelope;
-import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -44,39 +32,22 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import telcel.android.rick.com.rvisor.pojo.Credencial;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 
 /**
- * A login screen that offers login via email/password.
+ * A login screen that offers login via claveDistribuidor/claveVendedor
  */
-public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-
+public class LoginActivity extends AppCompatActivity{
 
     // Session Manager Class
     private SessionManager session;
-
-
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world", "28709:123"
-    };
-    /**
-     * Keep track of the login task to ensure we can cancel it if requested.
-     */
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsuarioCoppelView;
-    private EditText mPasswordView;
+    private EditText mClaveDistribuidorView;
+    private EditText mClaveVendedorView;
     private View mProgressView;
     private View mLoginFormView;
 
@@ -86,38 +57,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Session class instance
-
-
         session = new SessionManager(getApplicationContext());
         boolean firstRun = session.isFirstRun();
 
         if (!firstRun) {
             Intent intent = new Intent(this, ConsultaActivity.class);
             startActivity(intent);
-            Log.d("TAG1", "firstRun(false): " + Boolean.valueOf(firstRun).toString());
+            Log.d("APPLICATIONMOBILE", "firstRun(false): " + Boolean.valueOf(firstRun).toString());
         } else {
 
-            Log.d("TAG1", "firstRun(true): " + Boolean.valueOf(firstRun).toString());
-
-
-
+            Log.d("APPLICATIONMOBILE", "firstRun(true): " + Boolean.valueOf(firstRun).toString());
             // Set up the login form.
-            mUsuarioCoppelView = (AutoCompleteTextView) findViewById(R.id.distribuidor);
+            mClaveDistribuidorView = (EditText) findViewById(R.id.distribuidor);
 
-            mPasswordView = (EditText) findViewById(R.id.vendedor);
-            mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                    if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                        attemptLogin();
-                        return true;
-                    }
-                    return false;
-                }
-            });
+            mClaveVendedorView = (EditText) findViewById(R.id.vendedor);
 
-            Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-            mEmailSignInButton.setOnClickListener(new OnClickListener() {
+            Button mSignInButton = (Button) findViewById(R.id.sign_in_button);
+            mSignInButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     attemptLogin();
@@ -155,52 +111,52 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
 
         // Reset errors.
-        mUsuarioCoppelView.setError(null);
-        mPasswordView.setError(null);
+        mClaveDistribuidorView.setError(null);
+        mClaveVendedorView.setError(null);
 
         // Store values at the time of the login attempt.
-        String usuario = mPasswordView.getText().toString();
-        String password = mUsuarioCoppelView.getText().toString();
+        String distribuidor = mClaveDistribuidorView.getText().toString();
+        String vendedor = mClaveVendedorView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
-        if (TextUtils.isEmpty(usuario)) {
-            mUsuarioCoppelView.setError("La clave de vendedor no debe estar vacia");
-            focusView = mUsuarioCoppelView;
+        if (TextUtils.isEmpty(distribuidor)) {
+            mClaveDistribuidorView.setError("La clave de vendedor no debe estar vacia");
+            focusView = mClaveDistribuidorView;
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(password)) {
-            mPasswordView.setError("La clave de distribuidor no debe estar vacia");
-            focusView = mPasswordView;
-            cancel = true;
-        }
-
-
-        if (!isDigitValid(usuario)) {
-            mUsuarioCoppelView.setError("La clave de vendedor deben ser digitos");
-            focusView = mUsuarioCoppelView;
+        if (TextUtils.isEmpty(vendedor)) {
+            mClaveVendedorView.setError("La clave de distribuidor no debe estar vacia");
+            focusView = mClaveVendedorView;
             cancel = true;
         }
 
 
-        if (!isDigitValid(password)) {
-            mPasswordView.setError("La clave de distribuidor deben ser digitos");
-            focusView = mPasswordView;
+        if (!isDigitValid(distribuidor)) {
+            mClaveDistribuidorView.setError("La clave de vendedor deben ser digitos");
+            focusView = mClaveDistribuidorView;
             cancel = true;
         }
 
 
-        if (isLongitudValid(usuario)) {
-            mUsuarioCoppelView.setError("La clave de vendedor deben ser menor a 5 digitos");
-            focusView = mUsuarioCoppelView;
+        if (!isDigitValid(vendedor)) {
+            mClaveVendedorView.setError("La clave de distribuidor deben ser digitos");
+            focusView = mClaveVendedorView;
             cancel = true;
         }
 
-        if (isLongitudValid(password)) {
-            mPasswordView.setError("La clave de distribuidor deben ser menor a 5 digitos");
-            focusView = mPasswordView;
+
+        if (isLongitudValid(distribuidor)) {
+            mClaveDistribuidorView.setError("La clave de vendedor deben ser menor a 5 digitos");
+            focusView = mClaveDistribuidorView;
+            cancel = true;
+        }
+
+        if (isLongitudValid(vendedor)) {
+            mClaveVendedorView.setError("La clave de distribuidor deben ser menor a 5 digitos");
+            focusView = mClaveVendedorView;
             cancel = true;
         }
 
@@ -214,7 +170,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(usuario, password);
+            mAuthTask = new UserLoginTask(distribuidor, vendedor);
             mAuthTask.execute((Void) null);
         }
     }
@@ -265,59 +221,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
 
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
-            cursor.moveToNext();
-        }
-
-        addEmailsToAutoComplete(emails);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
-    }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mUsuarioCoppelView.setAdapter(adapter);
-    }
-
-
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -325,39 +229,22 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         final String NAMESPACE = "http://ws.telcel.com/";
-        final String URL="http://www.r7.telcel.com/activaciones_mobile_ws/activacionMobileWS?wsdl";
+        final String URL="https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
         final String METHOD_NAME = "realiza_autenticacion";
-        final String SOAP_ACTION = "http://ws.telcel.com/realiza_autenticacion";
-        private final String distribuidor=null;
-        private final String vendedor=null;
-
+        final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_autenticacion\"";
+        final String distribuidor;
+        final String vendedor;
+         SoapPrimitive codigo=   null;
+         SoapPrimitive  mensaje=    null;
 
         UserLoginTask(String distribuidor, String vendedor) {
-            distribuidor = distribuidor;
-            vendedor = vendedor;
+            this.distribuidor = distribuidor;
+            this.vendedor = vendedor;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
-            /*
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            */
 
             if (!isAvailableWSDL(URL)) {
                 System.out.println("NO esta arriba LOGin WSSSSSSSSSSSSSS");
@@ -367,14 +254,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             // Create the outgoing message
             SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
-
-            // Set Parameter
             System.out.println("cod_distribuidor "+distribuidor);
-            requestObject.addProperty("cod_distribuidor","1222");
+            System.out.println("cod_vendedor 11"+vendedor);
+            //   requestObject.addProperty(propInfo2);
 
-            System.out.println("cod_vendedor "+vendedor);
-            requestObject.addProperty("cod_vendedor","32323");
-
+            requestObject.addProperty("cod_distribuidor",distribuidor);
+            requestObject.addProperty("cod_vendedor",vendedor);
 
 
             // Create soap envelop .use version 1.1 of soap
@@ -383,12 +268,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             // add the outgoing object as the request
             envelope.setOutputSoapObject(requestObject);
-            envelope.dotNet = true;
-            //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
+            envelope.dotNet = false;
             HttpTransportSE ht = new HttpTransportSE(URL);
             ht.debug = true;
             // call and Parse Result.
-
             try {
                 ht.call(SOAP_ACTION, envelope);
             } catch (IOException e) {
@@ -396,51 +279,56 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             } catch (XmlPullParserException e) {
                 e.printStackTrace();
             }
-            //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
-          //  Log.e("Object response", response.toString());
-           // SoapObject resSoap = (SoapObject) envelope.bodyIn;
-            Object response =null;
-            try {
-                 response = envelope.getResponse();
-                Log.e("Object response", response.toString());
-            } catch (SoapFault soapFault) {
-                soapFault.printStackTrace();
+
+            String theXmlString = ht.responseDump;
+            Log.i("Resultado T: ",theXmlString);
+            SoapObject soap = (SoapObject) envelope.bodyIn;
+            SoapObject soapResult = (SoapObject)soap.getProperty(0);
+            Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
+/*            for(int i=0;i<soapResult.getPropertyCount();i++)
+            {
+                String result = null;
+                SoapPrimitive so =null;
+                try {
+                    so=    (SoapPrimitive) soapResult.getProperty(i);
+
+                    result = so.toString();
+                }catch(java.lang.ClassCastException e){
+                    Log.i("Error falta un campo: ",e.getMessage());
+                    continue;
+                }
+                //String result1 = so.getProperty(1).toString();
+                //here, you can get data from xml using so.getProperty("PublicationID")
+                //or the other tag in xml file.
+                // String result = (String)so.getProperty("apellidos");
+                Log.i("Resultado S: ",result);
+                //Log.i("Resultado S1: ",result1);
+            }
+*/
+           if (soapResult != null) {
+
+                SoapObject soapResult1 = (SoapObject)soap.getProperty(0);
+                Log.i("TOTAL PROPIEDADES S: ",""+soapResult1.getPropertyCount());
+                 codigo=    (SoapPrimitive) soapResult1.getProperty(0);
+                  mensaje=    (SoapPrimitive) soapResult1.getProperty(1);
+                Log.i("codigo ",codigo.toString());
+                Log.i("mensaje ",mensaje.toString());
+
+
             }
 
-          /*  if (resSoap != null) {
-
-                SoapObject soapResult = (SoapObject)resSoap.getProperty(0);
-                Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
-                SoapPrimitive codigo=    (SoapPrimitive) soapResult.getProperty(0);
-                SoapPrimitive  mensaje=    (SoapPrimitive) soapResult.getProperty(1);
-
-             //   codigoAct = codigo.toString();
-             //   mensajeAct= mensaje.toString();
-
-                 /*   for(int i=0;i<soapResult.getPropertyCount();i++)
-                    {
-                        String result = null;
-                        SoapPrimitive so =null;
-                        try {
-                            so=    (SoapPrimitive) soapResult.getProperty(i);
-
-                            result = so.toString();
-                        }catch(java.lang.ClassCastException e){
-                            Log.i("Error falta un campo: ",e.getMessage());
-                            continue;
-                        }
-
-                        Log.i("Resultado S: ",result);
-
-                    }
-                   */
-//            }
 
 
 
+           // Log.i("Resultado S: ","proper"+soap.getPropertyCount());
 
 
-            return true;
+
+            if(codigo.toString().equals("100"))
+                return true;
+            else
+                return false;
+
         }
 
         @Override
@@ -452,26 +340,28 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 System.out.println("Entre y guardo");
                 session.createLoginSession("Android Hive", "anroidhive@gmail.com");
                 // Store values at the time of the login attempt.
-
-                String vendedor = mPasswordView.getText().toString();
-                String distribuidor = mUsuarioCoppelView.getText().toString();
-
-
                 Credencial credencial = new Credencial();
-
                 credencial.setClaveVendedor(vendedor);
                 credencial.setClaveDistribuidor(distribuidor);
-
                 Intent intent =               new Intent(getApplicationContext(),ConsultaActivity.class);
                 intent.putExtra("credencial", credencial);
-
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
 
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                        if(mensaje.toString().startsWith("Clave de distribuidor")){
+                          //  mClaveDistribuidorView.setError(getString(R.string.error_incorrect_password));
+                            mClaveDistribuidorView.setError("Clave de Distribuidor incorrecta");
+                            mClaveDistribuidorView.requestFocus();
+
+                        }else{
+                            mClaveVendedorView.setError("Clave de Vendedor incorrecta");
+                            mClaveVendedorView.requestFocus();
+
+                        }
+
+
             }
         }
 
@@ -486,12 +376,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     protected Boolean estaConectado(){
         if(conectadoWifi()){
-          //  showAlertDialog(LoginActivity.this, "Conexion a Internet",
-              //      "Tu Dispositivo tiene Conexion a Wifi.", true);
+            //  showAlertDialog(LoginActivity.this, "Conexion a Internet",
+            //      "Tu Dispositivo tiene Conexion a Wifi.", true);
             return true;
         }else{
             if(conectadoRedMovil()){
-            //    showAlertDialog(LoginActivity.this, "Conexion a Internet",
+                //    showAlertDialog(LoginActivity.this, "Conexion a Internet",
                 //        "Tu Dispositivo tiene Conexion Movil.", true);
                 return true;
             }else{
@@ -532,11 +422,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this,R.style.myDialog);
         alert.setTitle(title);
         alert.setMessage(message+ "\n"
-                );
+        );
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-               // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 finish();
                 startActivity(getIntent());
             }
