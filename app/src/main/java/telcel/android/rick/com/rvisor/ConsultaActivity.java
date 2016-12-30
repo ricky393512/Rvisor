@@ -58,7 +58,8 @@ public class ConsultaActivity extends AppCompatActivity {
     // Session Manager Class
     SessionManager session;
     private NotificationManager notifyMgr;
-    final String URL = "http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
+    final String URL = "https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
+    Credencial credencial;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -159,7 +160,7 @@ public class ConsultaActivity extends AppCompatActivity {
         }
 
         try {
-            activacion.setProducto(tipoProducto.getId());
+        //    activacion.setProducto(tipoProducto.getId());
         }catch(NullPointerException e){
            Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
 
@@ -358,7 +359,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
         try {
 
-            Credencial credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
+             credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
 
 
             txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
@@ -459,7 +460,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
         Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
         //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
-        coopelWS = new CoopelWS(getApplicationContext(), mySpinner);
+        coopelWS = new CoopelWS(getApplicationContext(), mySpinner,credencial.getClaveDistribuidor());
         coopelWS.execute();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -503,7 +504,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
         Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
         //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
-        coopelWS = new CoopelWS(getApplicationContext(), mySpinner);
+        coopelWS = new CoopelWS(getApplicationContext(), mySpinner,credencial.getClaveDistribuidor());
         coopelWS.execute();
 
     }

@@ -5,31 +5,40 @@ package telcel.android.rick.com.rvisor.pojo;
  */
 public class TipoProducto {
 
-    private String id;
-    private String nombre;
+    private String descripcion;
+    private int idModalidad;
+    private int idProducto;
 
 
     public TipoProducto() {
     }
 
-    public String getId() {
-        return id;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public String getNombre() {
-        return nombre;
+    public int getIdModalidad() {
+        return idModalidad;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setIdModalidad(int idModalidad) {
+        this.idModalidad = idModalidad;
+    }
+
+    public int getIdProducto() {
+        return idProducto;
+    }
+
+    public void setIdProducto(int idProducto) {
+        this.idProducto = idProducto;
     }
 
     @Override
     public String toString() {
-        return this.nombre;            // What to display in the Spinner list.
+        return this.descripcion;            // What to display in the Spinner list.
     }
 }

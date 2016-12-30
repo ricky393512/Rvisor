@@ -354,8 +354,7 @@ public class LoginActivity extends AppCompatActivity{
                           //  mClaveDistribuidorView.setError(getString(R.string.error_incorrect_password));
                             mClaveDistribuidorView.setError("Clave de Distribuidor incorrecta");
                             mClaveDistribuidorView.requestFocus();
-
-                        }else{
+                   }else{
                             mClaveVendedorView.setError("Clave de Vendedor incorrecta");
                             mClaveVendedorView.requestFocus();
 
