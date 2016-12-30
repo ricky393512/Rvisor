@@ -50,6 +50,8 @@ public class LoginActivity extends AppCompatActivity{
     private EditText mClaveVendedorView;
     private View mProgressView;
     private View mLoginFormView;
+    private String mensajeFinal;
+    private String codigoeFinal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,40 +124,40 @@ public class LoginActivity extends AppCompatActivity{
         View focusView = null;
 
         if (TextUtils.isEmpty(distribuidor)) {
-            mClaveDistribuidorView.setError("La clave de vendedor no debe estar vacia");
+            mClaveDistribuidorView.setError("La clave de distribuidor no debe estar vacia");
             focusView = mClaveDistribuidorView;
             cancel = true;
         }
 
         if (TextUtils.isEmpty(vendedor)) {
-            mClaveVendedorView.setError("La clave de distribuidor no debe estar vacia");
+            mClaveVendedorView.setError("La clave de vendedor no debe estar vacia");
             focusView = mClaveVendedorView;
             cancel = true;
         }
 
 
         if (!isDigitValid(distribuidor)) {
-            mClaveDistribuidorView.setError("La clave de vendedor deben ser digitos");
+            mClaveDistribuidorView.setError("La clave de distribuidor deben ser digitos");
             focusView = mClaveDistribuidorView;
             cancel = true;
         }
 
 
         if (!isDigitValid(vendedor)) {
-            mClaveVendedorView.setError("La clave de distribuidor deben ser digitos");
+            mClaveVendedorView.setError("La clave de vendedor deben ser digitos");
             focusView = mClaveVendedorView;
             cancel = true;
         }
 
 
         if (isLongitudValid(distribuidor)) {
-            mClaveDistribuidorView.setError("La clave de vendedor deben ser menor a 5 digitos");
+            mClaveDistribuidorView.setError("La clave de distribuidor deben ser menor a 5 digitos");
             focusView = mClaveDistribuidorView;
             cancel = true;
         }
 
         if (isLongitudValid(vendedor)) {
-            mClaveVendedorView.setError("La clave de distribuidor deben ser menor a 5 digitos");
+            mClaveVendedorView.setError("La clave de vendedor deben ser menor a 5 digitos");
             focusView = mClaveVendedorView;
             cancel = true;
         }
@@ -229,7 +231,7 @@ public class LoginActivity extends AppCompatActivity{
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         final String NAMESPACE = "http://ws.telcel.com/";
-        final String URL="https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
+        final String URL="https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
         final String METHOD_NAME = "realiza_autenticacion";
         final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_autenticacion\"";
         final String distribuidor;
@@ -311,6 +313,9 @@ public class LoginActivity extends AppCompatActivity{
                 Log.i("TOTAL PROPIEDADES S: ",""+soapResult1.getPropertyCount());
                  codigo=    (SoapPrimitive) soapResult1.getProperty(0);
                   mensaje=    (SoapPrimitive) soapResult1.getProperty(1);
+
+               mensajeFinal=mensaje.toString();
+               codigoeFinal=codigo.toString();
                 Log.i("codigo ",codigo.toString());
                 Log.i("mensaje ",mensaje.toString());
 
@@ -338,26 +343,29 @@ public class LoginActivity extends AppCompatActivity{
 
             if (success) {
                 System.out.println("Entre y guardo");
-                session.createLoginSession("Android Hive", "anroidhive@gmail.com");
+                session.createLoginSession(distribuidor, vendedor);
                 // Store values at the time of the login attempt.
                 Credencial credencial = new Credencial();
                 credencial.setClaveVendedor(vendedor);
                 credencial.setClaveDistribuidor(distribuidor);
                 Intent intent =               new Intent(getApplicationContext(),ConsultaActivity.class);
-                intent.putExtra("credencial", credencial);
+            //    intent.putExtra("credencial", credencial);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
 
             } else {
-                        if(mensaje.toString().startsWith("Clave de distribuidor")){
+                        if(mensajeFinal.toString().startsWith("Clave de distribuidor")){
                           //  mClaveDistribuidorView.setError(getString(R.string.error_incorrect_password));
                             mClaveDistribuidorView.setError("Clave de Distribuidor incorrecta");
                             mClaveDistribuidorView.requestFocus();
-                   }else{
+                   }else if (mensajeFinal.toString().startsWith("Clave de vendedor")) {
                             mClaveVendedorView.setError("Clave de Vendedor incorrecta");
                             mClaveVendedorView.requestFocus();
 
+                        }else if (mensajeFinal.toString().startsWith("WebService NO DISPONIBLE:")){
+                            showAlertDialog(LoginActivity.this, "Problemas WS",
+                                    mensajeFinal, false);
                         }
 
 
@@ -437,6 +445,7 @@ public class LoginActivity extends AppCompatActivity{
 
     public boolean isAvailableWSDL(String url) {
         HttpURLConnection c = null;
+        Integer httpStatusCode=0;
         try {
             URL siteURL = new URL(url);
             c = (HttpURLConnection) siteURL
@@ -445,10 +454,21 @@ public class LoginActivity extends AppCompatActivity{
             c.setConnectTimeout(1000); //set timeout to 5 seconds
             c.setReadTimeout(1000);
             c.connect();
-
+            httpStatusCode = c.getResponseCode(); //200, 404 etc.
+            System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);
+            if(httpStatusCode==200)
             return true;
+            else {
+                mensajeFinal="WebService NO DISPONIBLE: "+codigoeFinal;
+                codigoeFinal=httpStatusCode.toString();
+                return false;
+
+            }
 
         } catch (Exception e) {
+            System.out.println("No levante "+e.getMessage());
+            mensajeFinal="WebService NO DISPONIBLE: "+e.getMessage();
+            codigoeFinal=httpStatusCode.toString();
             return false;
         } finally {
             if (c != null) {

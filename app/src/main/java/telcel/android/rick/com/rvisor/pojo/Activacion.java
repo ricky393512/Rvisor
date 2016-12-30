@@ -12,7 +12,7 @@ public class Activacion implements KvmSerializable {
     private String imei;
     private String iccid;
     private  Integer codigoCiudad;
-    private String producto;
+    private  Integer idProducto;
     public Activacion() {
         super();
     }
@@ -34,11 +34,40 @@ public class Activacion implements KvmSerializable {
     public void setCodigoCiudad(Integer codigoCiudad) {
         this.codigoCiudad = codigoCiudad;
     }
-    public String getProducto() {
-        return producto;
+    private String codigoDistribuidor;
+    private String codigoVendedor;
+    private Integer idModalidad;
+
+    public String getCodigoDistribuidor() {
+        return codigoDistribuidor;
     }
-    public void setProducto(String producto) {
-        this.producto = producto;
+
+    public void setCodigoDistribuidor(String codigoDistribuidor) {
+        this.codigoDistribuidor = codigoDistribuidor;
+    }
+
+    public String getCodigoVendedor() {
+        return codigoVendedor;
+    }
+
+    public void setCodigoVendedor(String codigoVendedor) {
+        this.codigoVendedor = codigoVendedor;
+    }
+
+    public Integer getIdModalidad() {
+        return idModalidad;
+    }
+
+    public void setIdModalidad(Integer idModalidad) {
+        this.idModalidad = idModalidad;
+    }
+
+    public Integer getIdProducto() {
+        return idProducto;
+    }
+
+    public void setIdProducto(Integer idProducto) {
+        this.idProducto = idProducto;
     }
 
     @Override
@@ -52,7 +81,7 @@ public class Activacion implements KvmSerializable {
             case 2:
                 return codigoCiudad;
             case 3:
-                return producto;
+                return idProducto;
         }
         return null;
 
@@ -85,8 +114,8 @@ public class Activacion implements KvmSerializable {
                 propertyInfo.name = "codigoCiudad";
                 break;
             case 3:
-                propertyInfo.type = PropertyInfo.STRING_CLASS;
-                propertyInfo.name = "producto";
+                propertyInfo.type = PropertyInfo.INTEGER_CLASS;
+                propertyInfo.name = "idProducto";
                 break;
             default:break;
         }

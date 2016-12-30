@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import telcel.android.rick.com.rvisor.pojo.Activacion;
@@ -49,7 +50,7 @@ import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.Ses
 import telcel.android.rick.com.rvisor.ws.CoopelWS;
 
 public class ConsultaActivity extends AppCompatActivity {
-
+    View focusView = null;
     EditText campo_imei;
     EditText campo_iccid;
     EditText campo_codigo_ciudad;
@@ -58,7 +59,7 @@ public class ConsultaActivity extends AppCompatActivity {
     // Session Manager Class
     SessionManager session;
     private NotificationManager notifyMgr;
-    final String URL = "https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
+    final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     Credencial credencial;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -108,60 +109,93 @@ public class ConsultaActivity extends AppCompatActivity {
 
     }
 
-    public void  realizaActivacion(){
 
-        //TODO Validaciones
+    public boolean validacionActivacion(){
 
-        System.out.println("Realizadooooooooooooooooooo Validacobes");
-        TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
-
-
-        View focusView = null;
         boolean cancel = false;
         String imei =campo_imei.getText().toString();
         String iccid =campo_iccid.getText().toString();
-
-        if (TextUtils.isEmpty(imei)) {
-            campo_imei.setError("Debes ingresar un imei");
-            focusView = campo_imei;
-            cancel = true;
-        }
 
         if (TextUtils.isEmpty(campo_iccid.getText().toString())) {
             campo_iccid.setError("Debes ingresar un iccid");
             focusView = campo_iccid;
             cancel = true;
+            return cancel;
         }
+
+        if(campo_iccid.getText().toString().length()>20 || campo_iccid.getText().toString().length()<18){
+            campo_iccid.setError("Debes ingresar un iccid DE 18 ó 19 digitos");
+            focusView = campo_iccid;
+            cancel = true;
+            return cancel;
+        }
+
+        if (TextUtils.isEmpty(imei)) {
+            campo_imei.setError("Debes ingresar un imei");
+            focusView = campo_imei;
+            cancel = true;
+            return cancel;
+        }
+
+        if(campo_imei.getText().toString().length()>15 || campo_imei.getText().toString().length()<15){
+            campo_imei.setError("Debes ingresar un imei de 15 digitos");
+            focusView = campo_imei;
+            cancel = true;
+            return cancel;
+        }
+
+
 
         if (TextUtils.isEmpty(campo_codigo_ciudad.getText().toString().trim())) {
-            campo_codigo_ciudad.setError("Debes ingresar un iccid");
+            campo_codigo_ciudad.setError("Debes ingresar un codigo de ciudad");
             focusView = campo_codigo_ciudad;
             cancel = true;
+            return cancel;
         }
 
+        if(campo_codigo_ciudad.getText().toString().length()>3 || campo_codigo_ciudad.getText().toString().length()<3){
+            campo_codigo_ciudad.setError("Debes ingresar un codigo ciudad de 3 digitos");
+            focusView = campo_codigo_ciudad;
+            cancel = true;
+            return cancel;
+        }
 
-        if (cancel) {
+        return cancel;
+    }
+
+
+
+    public void  realizaActivacion(){
+
+        //TODO Validaciones
+
+        System.out.println("Realizadooooooooooooooooooo Validacobes");
+        final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+
+
+
+
+        if (validacionActivacion()) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
-        }
+        } else {
 
 
+            final Activacion activacion = new Activacion();
+            activacion.setImei(campo_imei.getText().toString());
+            activacion.setIccid(campo_iccid.getText().toString());
 
-        final Activacion activacion = new Activacion();
-        activacion.setImei(campo_imei.getText().toString());
-        activacion.setIccid(campo_iccid.getText().toString());
+            try {
+                activacion.setCodigoCiudad(Integer.parseInt(campo_codigo_ciudad.getText().toString()));
+            } catch (NumberFormatException e) {
+                campo_codigo_ciudad.setError("Debes ingresar un codigo de ciudad");
+                campo_codigo_ciudad.requestFocus();
+            }
 
-        try{
-        activacion.setCodigoCiudad(Integer.parseInt(campo_codigo_ciudad.getText().toString()));
-        }catch(NumberFormatException e){
-            campo_codigo_ciudad.setError("Debes ingresar un codigo de ciudad");
-            campo_codigo_ciudad.requestFocus();
-        }
-
-        try {
-        //    activacion.setProducto(tipoProducto.getId());
-        }catch(NullPointerException e){
+            // try {
+            activacion.setIdProducto(tipoProducto.getIdProducto());
+     /*   }catch(NullPointerException e){
            Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
 
             TextView errorText = (TextView)mySpinner.getSelectedView();
@@ -169,92 +203,88 @@ public class ConsultaActivity extends AppCompatActivity {
             errorText.setTextColor(Color.RED);//just to highlight that this is an error
             errorText.setText("Debes seleccionar un producto");//changes the selected item text to this
             errorText.requestFocus();
-        }
+        }*/
+
+            activacion.setIdModalidad(tipoProducto.getIdModalidad());
+            System.out.println();
+            activacion.setCodigoDistribuidor(credencial.getClaveDistribuidor());
+            activacion.setCodigoVendedor(credencial.getClaveVendedor());
+
+            new AsyncTask<Void, Void, Boolean>() {
+                private TextView txtResultado;
+                private List<TipoProducto> listaProductos;
+                private Spinner mySpinner;
+                /*    final String NAMESPACE = "http://hello_webservice/";
+                    final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
+                    final String METHOD_NAME = "activaTelefono";
+                    final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/activaTelefono";
+                    */
+                final String NAMESPACE = "http://ws.telcel.com/";
+                final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
+                final String METHOD_NAME = "realiza_activacion";
+                final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
+                String codigoAct;
+                String mensajeAct;
+
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
 
 
-        new AsyncTask<Void, Void, Boolean>() {
-            private TextView txtResultado;
-            private List<TipoProducto> listaProductos;
-            private Spinner mySpinner;
-        /*    final String NAMESPACE = "http://hello_webservice/";
-            final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
-            final String METHOD_NAME = "activaTelefono";
-            final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/activaTelefono";
-            */
-            final String NAMESPACE = "http://ws.telcel.com/";
-            final String URL="https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
-            final String METHOD_NAME = "realiza_activacion";
-            final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
-            String codigoAct;
-            String mensajeAct;
-
-
-
-
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-
-
-
-            }
-
-            @Override
-            protected Boolean doInBackground(Void... params) {
-// TODO: attempt authentication against a network service.
-//WebService - Opciones
-
-
-
-
-                listaProductos = new ArrayList<TipoProducto>();
-
-                if (!isAvailableWSDL(URL)) {
-                    System.out.println("NO esta arriba");
-
-                    return false;
                 }
 
-                // Create the outgoing message
-                SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
-
-                // Set Parameter
-                System.out.println(" im eie "+activacion.getImei());
+                @Override
+                protected Boolean doInBackground(Void... params) {
+                    listaProductos = new ArrayList<TipoProducto>();
+                    if (!isAvailableWSDL(URL)) {
+                        System.out.println("NO esta arriba");
+                        return false;
+                    }
+                    // Create the outgoing message
+                    SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
+                    // Set Parameter
+                    System.out.println(" im eie " + activacion.getImei());
                     requestObject.addProperty("imei", activacion.getImei());
-                requestObject.addProperty("iccid", activacion.getIccid());
-
-                // Create soap envelop .use version 1.1 of soap
-                SoapSerializationEnvelope envelope =
-                        new SoapSerializationEnvelope(SoapEnvelope.VER11);
-
-                // add the outgoing object as the request
-                envelope.setOutputSoapObject(requestObject);
-         //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
-                HttpTransportSE ht = new HttpTransportSE(URL);
-                ht.debug = true;
-                // call and Parse Result.
-
-                try {
-                    ht.call(SOAP_ACTION, envelope);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                }
-                //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
-
-                SoapObject resSoap = (SoapObject) envelope.bodyIn;
+                    requestObject.addProperty("iccid", activacion.getIccid());
+                    requestObject.addProperty("cod_ciudad", activacion.getCodigoCiudad());
+                    requestObject.addProperty("cod_distribuidor", activacion.getCodigoDistribuidor());
+                    requestObject.addProperty("cod_vendedor", activacion.getCodigoVendedor());
+                    requestObject.addProperty("id_tipo_producto", tipoProducto.getIdProducto());
+                    requestObject.addProperty("id_modalidad_activacion", activacion.getIdModalidad());
 
 
-                if (resSoap != null) {
+                    // Create soap envelop .use version 1.1 of soap
+                    SoapSerializationEnvelope envelope =
+                            new SoapSerializationEnvelope(SoapEnvelope.VER11);
 
-                    SoapObject soapResult = (SoapObject)resSoap.getProperty(0);
-                    Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
-                    SoapPrimitive  codigo=    (SoapPrimitive) soapResult.getProperty(0);
-                    SoapPrimitive  mensaje=    (SoapPrimitive) soapResult.getProperty(1);
+                    // add the outgoing object as the request
+                    envelope.setOutputSoapObject(requestObject);
+                    //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
+                    HttpTransportSE ht = new HttpTransportSE(URL);
+                    ht.debug = true;
+                    // call and Parse Result.
 
-                    codigoAct = codigo.toString();
-                    mensajeAct= mensaje.toString();
+                    try {
+                        ht.call(SOAP_ACTION, envelope);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (XmlPullParserException e) {
+                        e.printStackTrace();
+                    }
+                    //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
+
+                    SoapObject resSoap = (SoapObject) envelope.bodyIn;
+
+
+                    if (resSoap != null) {
+
+                        SoapObject soapResult = (SoapObject) resSoap.getProperty(0);
+                        Log.i("TOTAL PROPIEDADES S: ", "" + soapResult.getPropertyCount());
+                        SoapPrimitive codigo = (SoapPrimitive) soapResult.getProperty(0);
+                        SoapPrimitive mensaje = (SoapPrimitive) soapResult.getProperty(1);
+
+                        codigoAct = codigo.toString();
+                        mensajeAct = mensaje.toString();
 
                  /*   for(int i=0;i<soapResult.getPropertyCount();i++)
                     {
@@ -273,62 +303,53 @@ public class ConsultaActivity extends AppCompatActivity {
 
                     }
                    */
+                    }
+
+                    return true;
                 }
 
 
+                @Override
+                protected void onPostExecute(final Boolean success) {
+                    if (success == false) {
+                        ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
 
 
+                    } else {
+                        // Toast.makeText(ConsultaActivity.this, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
 
+                        AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
+                        alert.setTitle("Atención");
+                        alert.setMessage("Se ha realizado la activacion correctamente \n"
+                                + mensajeAct
 
+                                + "\n");
+                        alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        });
+                        AlertDialog dialog = alert.create();
+                        dialog.show();
 
-
-                return true;
-            }
-
-
-            @Override
-            protected void onPostExecute(final Boolean success) {
-                if(success==false){
-                 ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
+                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", mensajeAct);
+                    }
 
 
                 }
-                else{
-                   // Toast.makeText(ConsultaActivity.this, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
 
-                    AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
-                    alert.setTitle("Atención");
-                    alert.setMessage("Se ha realizado la activacion correctamente \n"
-                            +mensajeAct
-
-                            + "\n");
-                    alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                         //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                            finish();
-                            startActivity(getIntent());
-                        }
-                    });
-                    AlertDialog dialog = alert.create();
-                    dialog.show();
+                @Override
+                protected void onCancelled() {
+                    Toast.makeText(ConsultaActivity.this, "Error", Toast.LENGTH_LONG).show();
                 }
 
 
-            }
+            }.execute();
 
-            @Override
-            protected void onCancelled() {
-                Toast.makeText(ConsultaActivity.this, "Error", Toast.LENGTH_LONG).show();
-            }
-
-
-
-
-
-        }.execute();
-
-
+        }
 
     }
 
@@ -364,10 +385,12 @@ public class ConsultaActivity extends AppCompatActivity {
         campo_codigo_ciudad = (EditText) findViewById(R.id.campo_ciudad);
         txtResultado = (TextView) findViewById(R.id.txtResultado);
 
-        try {
+         //    credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
 
-             credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
-
+        HashMap<String,String> mapaCrendenciales= session.getUserDetails();
+            Credencial credencial = new Credencial();
+            credencial.setClaveDistribuidor(mapaCrendenciales.get("distribuidor"));
+            credencial.setClaveVendedor(mapaCrendenciales.get("vendedor"));
 
             txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
             txtClaveDistribuidor = (TextView) findViewById(R.id.txtClaveDistribuidor);
@@ -376,9 +399,6 @@ public class ConsultaActivity extends AppCompatActivity {
             txtClaveVendedor.setText(credencial.getClaveVendedor());
             txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
 
-        } catch (NullPointerException e) {
-
-        }
 
         btnProducto.setOnClickListener(new View.OnClickListener() {
 
@@ -405,7 +425,7 @@ public class ConsultaActivity extends AppCompatActivity {
                 //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
                 realizaActivacion();
 
-                notification4(1, R.drawable.ic_telefono, "Aviso", " 2222222222");
+
             //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
 
 
@@ -467,8 +487,9 @@ public class ConsultaActivity extends AppCompatActivity {
 
         Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
         //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
-        coopelWS = new CoopelWS(getApplicationContext(), mySpinner,credencial.getClaveDistribuidor());
-        coopelWS.execute();
+
+    coopelWS = new CoopelWS(getApplicationContext(), mySpinner, credencial.getClaveDistribuidor());
+    coopelWS.execute();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -581,7 +602,7 @@ public class ConsultaActivity extends AppCompatActivity {
                         ))
 
                         .setContentTitle(titulo)
-                        .setContentText(contenido).setNumber(2)
+                        .setContentText(contenido)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         ;
 
@@ -589,16 +610,6 @@ public class ConsultaActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        // Crear pending intent
-     /*   PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                PendingIntent.FLAG_CANCEL_CURRENT);
-
-        // Asignar intent y establecer true para notificar como aviso
-        builder.setFullScreenIntent(fullScreenPendingIntent, true);
-*/
 
 // API 11 o mayor
         builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);

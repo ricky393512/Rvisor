@@ -38,7 +38,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/getProductos";
 */
     final String NAMESPACE = "http://ws.telcel.com/";
-    final String URL="https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
+    final String URL="https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     final String METHOD_NAME = "listado_productos";
     final String SOAP_ACTION = "\"http://ws.telcel.com/listado_productos\"";
     final String codigoDistribuidor;
