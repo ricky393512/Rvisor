@@ -66,6 +66,10 @@ public class ConsultaActivity extends AppCompatActivity {
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+    String codigoAct;
+    String mensajeAct;
+    String montoAct;
+    String telefonoAct;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,16 +82,7 @@ public class ConsultaActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-       /* case R.id.add:
-            //add the function to perform here
-            return(true);
-        case R.id.reset:
-            //add the function to perform here
-            return(true);
-        case R.id.about:
-            //add the function to perform here
-            return(true);
-        */
+
             case R.id.exit:
                 salir();
                 return (true);
@@ -171,6 +166,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
         final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+
         System.out.println("Realizadooooooooooooooooooo Validacobes"+tipoProducto.getDescripcion());
 
 
@@ -208,10 +204,7 @@ public class ConsultaActivity extends AppCompatActivity {
                 final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
                 final String METHOD_NAME = "realiza_activacion";
                 final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
-                String codigoAct;
-                String mensajeAct;
-                String montoAct;
-                String telefonoAct;
+
 
                 @Override
                 protected void onPreExecute() {
@@ -310,6 +303,29 @@ public class ConsultaActivity extends AppCompatActivity {
                 protected void onPostExecute(final Boolean success) {
                     if (success == false) {
                         ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
+
+                        AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
+                        alert.setTitle("Error !!!");
+                        alert.setMessage("Se ha presentado el siguiente problema: \n"
+                                + mensajeAct
+
+
+
+                        );
+                        alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                                finish();
+                                startActivity(getIntent());
+                            }
+                        });
+                        AlertDialog dialog = alert.create();
+                        dialog.setCancelable(false);
+                        dialog.show();
+
+
+
 
 
                     } else {
@@ -467,8 +483,19 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             protected Boolean doInBackground(String... params) {
              //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
-             boolean valor = isAvailableWSDL(URL);
-                return valor ;
+            // boolean valor = isAvailableWSDL(URL);
+
+
+              //  return valor ;
+
+                if (!isAvailableWSDL(URL)) {
+                    System.out.println("NO esta arriba LOGin WSSSSSSSSSSSSSS");
+
+                    return false;
+                } else
+                  return true;
+
+
             }
 
             @Override
@@ -602,7 +629,8 @@ public class ConsultaActivity extends AppCompatActivity {
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
 
-        // Estructurar la notificación
+        // Estructura  la notificación
+
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(iconId).setLargeIcon(
@@ -633,6 +661,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
     public boolean isAvailableWSDL(String url) {
         HttpURLConnection c = null;
+        Integer httpStatusCode=0;
         try {
             URL siteURL = new URL(url);
             c = (HttpURLConnection) siteURL
@@ -641,10 +670,23 @@ public class ConsultaActivity extends AppCompatActivity {
             c.setConnectTimeout(1000); //set timeout to 5 seconds
             c.setReadTimeout(1000);
             c.connect();
+            httpStatusCode = c.getResponseCode(); //200, 404 etc.
+            System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);
+            if(httpStatusCode==200)
+                return true;
+            else {
+                mensajeAct="WebService NO DISPONIBLE: "+codigoAct;
+                codigoAct=httpStatusCode.toString();
 
-            return true;
+                return false;
+
+            }
+
+
 
         } catch (Exception e) {
+            mensajeAct="WebService NO DISPONIBLE: "+codigoAct;
+            codigoAct=httpStatusCode.toString();
             return false;
         } finally {
             if (c != null) {
