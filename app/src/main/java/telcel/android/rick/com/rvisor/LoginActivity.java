@@ -451,8 +451,8 @@ public class LoginActivity extends AppCompatActivity{
             c = (HttpURLConnection) siteURL
                     .openConnection();
             c.setRequestMethod("HEAD");
-            c.setConnectTimeout(1000); //set timeout to 5 seconds
-            c.setReadTimeout(1000);
+            c.setConnectTimeout(9000); //set timeout to 5 seconds
+            c.setReadTimeout(9000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
             System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);

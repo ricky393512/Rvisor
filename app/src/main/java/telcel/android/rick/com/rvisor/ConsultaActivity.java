@@ -60,7 +60,7 @@ public class ConsultaActivity extends AppCompatActivity {
     SessionManager session;
     private NotificationManager notifyMgr;
     final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
-    Credencial credencial;
+    Credencial credencial= new Credencial();
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -123,13 +123,13 @@ public class ConsultaActivity extends AppCompatActivity {
             return cancel;
         }
 
-        if(campo_iccid.getText().toString().length()>20 || campo_iccid.getText().toString().length()<18){
+  /*      if(campo_iccid.getText().toString().length()>20 || campo_iccid.getText().toString().length()<18){
             campo_iccid.setError("Debes ingresar un iccid DE 18 ó 19 digitos");
             focusView = campo_iccid;
             cancel = true;
             return cancel;
         }
-
+*/
         if (TextUtils.isEmpty(imei)) {
             campo_imei.setError("Debes ingresar un imei");
             focusView = campo_imei;
@@ -137,14 +137,14 @@ public class ConsultaActivity extends AppCompatActivity {
             return cancel;
         }
 
-        if(campo_imei.getText().toString().length()>15 || campo_imei.getText().toString().length()<15){
+  /*      if(campo_imei.getText().toString().length()>15 || campo_imei.getText().toString().length()<15){
             campo_imei.setError("Debes ingresar un imei de 15 digitos");
             focusView = campo_imei;
             cancel = true;
             return cancel;
         }
 
-
+*/
 
         if (TextUtils.isEmpty(campo_codigo_ciudad.getText().toString().trim())) {
             campo_codigo_ciudad.setError("Debes ingresar un codigo de ciudad");
@@ -153,13 +153,13 @@ public class ConsultaActivity extends AppCompatActivity {
             return cancel;
         }
 
-        if(campo_codigo_ciudad.getText().toString().length()>3 || campo_codigo_ciudad.getText().toString().length()<3){
+  /*      if(campo_codigo_ciudad.getText().toString().length()>3 || campo_codigo_ciudad.getText().toString().length()<3){
             campo_codigo_ciudad.setError("Debes ingresar un codigo ciudad de 3 digitos");
             focusView = campo_codigo_ciudad;
             cancel = true;
             return cancel;
         }
-
+*/
         return cancel;
     }
 
@@ -167,11 +167,11 @@ public class ConsultaActivity extends AppCompatActivity {
 
     public void  realizaActivacion(){
 
-        //TODO Validaciones
 
-        System.out.println("Realizadooooooooooooooooooo Validacobes");
+
+
         final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
-
+        System.out.println("Realizadooooooooooooooooooo Validacobes"+tipoProducto.getDescripcion());
 
 
 
@@ -193,18 +193,8 @@ public class ConsultaActivity extends AppCompatActivity {
                 campo_codigo_ciudad.requestFocus();
             }
 
-            // try {
+
             activacion.setIdProducto(tipoProducto.getIdProducto());
-     /*   }catch(NullPointerException e){
-           Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
-
-            TextView errorText = (TextView)mySpinner.getSelectedView();
-            errorText.setError("Debes seleccionar un producto");
-            errorText.setTextColor(Color.RED);//just to highlight that this is an error
-            errorText.setText("Debes seleccionar un producto");//changes the selected item text to this
-            errorText.requestFocus();
-        }*/
-
             activacion.setIdModalidad(tipoProducto.getIdModalidad());
             System.out.println();
             activacion.setCodigoDistribuidor(credencial.getClaveDistribuidor());
@@ -214,17 +204,14 @@ public class ConsultaActivity extends AppCompatActivity {
                 private TextView txtResultado;
                 private List<TipoProducto> listaProductos;
                 private Spinner mySpinner;
-                /*    final String NAMESPACE = "http://hello_webservice/";
-                    final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
-                    final String METHOD_NAME = "activaTelefono";
-                    final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/activaTelefono";
-                    */
                 final String NAMESPACE = "http://ws.telcel.com/";
                 final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
                 final String METHOD_NAME = "realiza_activacion";
                 final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
                 String codigoAct;
                 String mensajeAct;
+                String montoAct;
+                String telefonoAct;
 
                 @Override
                 protected void onPreExecute() {
@@ -282,9 +269,13 @@ public class ConsultaActivity extends AppCompatActivity {
                         Log.i("TOTAL PROPIEDADES S: ", "" + soapResult.getPropertyCount());
                         SoapPrimitive codigo = (SoapPrimitive) soapResult.getProperty(0);
                         SoapPrimitive mensaje = (SoapPrimitive) soapResult.getProperty(1);
+                        SoapPrimitive monto = (SoapPrimitive) soapResult.getProperty(2);
+                        SoapPrimitive telefono = (SoapPrimitive) soapResult.getProperty(3);
 
                         codigoAct = codigo.toString();
                         mensajeAct = mensaje.toString();
+                        montoAct= monto.toString();
+                        telefonoAct= telefono.toString();
 
                  /*   for(int i=0;i<soapResult.getPropertyCount();i++)
                     {
@@ -303,6 +294,12 @@ public class ConsultaActivity extends AppCompatActivity {
 
                     }
                    */
+
+                        if(codigoAct.equals("100"))
+                            return true;
+                        else
+                            return false;
+
                     }
 
                     return true;
@@ -322,8 +319,21 @@ public class ConsultaActivity extends AppCompatActivity {
                         alert.setTitle("Atención");
                         alert.setMessage("Se ha realizado la activacion correctamente \n"
                                 + mensajeAct
+                                +"\n"
+                                +"Con telefono: "
 
-                                + "\n");
+                                +telefonoAct
+                                + "\n"
+                                +"Y monto: "
+
+                                +montoAct
+                                + "\n"
+
+
+
+
+
+                        );
                         alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -333,9 +343,10 @@ public class ConsultaActivity extends AppCompatActivity {
                             }
                         });
                         AlertDialog dialog = alert.create();
+                        dialog.setCancelable(false);
                         dialog.show();
 
-                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", mensajeAct);
+                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", mensajeAct,telefonoAct,montoAct);
                     }
 
 
@@ -388,7 +399,7 @@ public class ConsultaActivity extends AppCompatActivity {
          //    credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
 
         HashMap<String,String> mapaCrendenciales= session.getUserDetails();
-            Credencial credencial = new Credencial();
+
             credencial.setClaveDistribuidor(mapaCrendenciales.get("distribuidor"));
             credencial.setClaveVendedor(mapaCrendenciales.get("vendedor"));
 
@@ -586,7 +597,7 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
-    public void notification4(int id, int iconId, String titulo, String contenido) {
+    public void notification4(int id, int iconId, String titulo, String contenido,String telefono,String monto) {
         notifyMgr = (NotificationManager) this
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -601,8 +612,8 @@ public class ConsultaActivity extends AppCompatActivity {
 
                         ))
 
-                        .setContentTitle(titulo)
-                        .setContentText(contenido)
+                        .setContentTitle(telefono)
+                        .setContentText(monto)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         ;
 
