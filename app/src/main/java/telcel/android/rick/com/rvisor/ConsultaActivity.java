@@ -176,10 +176,15 @@ public class ConsultaActivity extends AppCompatActivity {
             private TextView txtResultado;
             private List<TipoProducto> listaProductos;
             private Spinner mySpinner;
-            final String NAMESPACE = "http://hello_webservice/";
+        /*    final String NAMESPACE = "http://hello_webservice/";
             final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
             final String METHOD_NAME = "activaTelefono";
             final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/activaTelefono";
+            */
+            final String NAMESPACE = "http://ws.telcel.com/";
+            final String URL="https://www.r7.telcel.com/activaciones_mobile_ws/ActivacionMobileService?wsdl";
+            final String METHOD_NAME = "realiza_activacion";
+            final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
             String codigoAct;
             String mensajeAct;
 
@@ -215,8 +220,8 @@ public class ConsultaActivity extends AppCompatActivity {
 
                 // Set Parameter
                 System.out.println(" im eie "+activacion.getImei());
-                    requestObject.addProperty("arg0", activacion);
-
+                    requestObject.addProperty("imei", activacion.getImei());
+                requestObject.addProperty("iccid", activacion.getIccid());
 
                 // Create soap envelop .use version 1.1 of soap
                 SoapSerializationEnvelope envelope =
@@ -300,7 +305,9 @@ public class ConsultaActivity extends AppCompatActivity {
                     alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                         //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                            finish();
+                            startActivity(getIntent());
                         }
                     });
                     AlertDialog dialog = alert.create();
