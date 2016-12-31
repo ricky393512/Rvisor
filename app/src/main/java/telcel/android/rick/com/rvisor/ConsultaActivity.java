@@ -6,12 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -362,7 +360,17 @@ public class ConsultaActivity extends AppCompatActivity {
                         dialog.setCancelable(false);
                         dialog.show();
 
-                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", mensajeAct,telefonoAct,montoAct);
+                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", "Se ha realizado la activacion correctamente \n"
+                                + mensajeAct
+                                +"\n"
+                                +"Con telefono: "
+
+                                +telefonoAct
+                                + "\n"
+                                +"Y monto: "
+
+                                +montoAct
+                                + "\n",telefonoAct,montoAct);
                     }
 
 
@@ -630,7 +638,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
         // Estructura  la notificación
-
+/*
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(iconId).setLargeIcon(
@@ -644,6 +652,22 @@ public class ConsultaActivity extends AppCompatActivity {
                         .setContentText(monto)
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         ;
+*/
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+
+        builder
+                .setContentTitle(titulo)
+                .setContentText(contenido +" Telefono: "+telefono+" monto:"+monto)
+                .setContentInfo("Informacion activacion")
+                .setSmallIcon(R.drawable.ic_telefono);
+                //.setLargeIcon(bitmapIcon);
+
+         new Notification.BigTextStyle(builder)
+                .bigText(contenido +" Telefono: "+telefono+" monto:"+monto)
+                .setBigContentTitle("Mensaje de Activacion")
+                .setSummaryText("Resultado de Activacion")
+                .build();
+
 
         // Crear intent
         Intent intent = new Intent(this, LoginActivity.class);
