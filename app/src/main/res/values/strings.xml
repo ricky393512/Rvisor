@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Rvisor</string>
+    <string name="app_name">R-activador</string>
 
     <!-- Strings related to login -->
     <string name="prompt_user">Clave de Vendedor</string>

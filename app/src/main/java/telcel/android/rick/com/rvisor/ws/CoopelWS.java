@@ -42,6 +42,8 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     final String METHOD_NAME = "listado_productos";
     final String SOAP_ACTION = "\"http://ws.telcel.com/listado_productos\"";
     final String codigoDistribuidor;
+    private String mensajeFinal;
+    private String codigoeFinal;
 
     public CoopelWS(Context context, Spinner mySpinner,String codigoDistribuidor){
         this.context=context;
@@ -227,6 +229,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
     public boolean isAvailableWSDL(String url) {
         HttpURLConnection c = null;
+        Integer httpStatusCode=0;
         try {
             URL siteURL = new URL(url);
             c = (HttpURLConnection) siteURL
@@ -235,9 +238,17 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
             c.setConnectTimeout(1000); //set timeout to 5 seconds
             c.setReadTimeout(1000);
             c.connect();
+            httpStatusCode = c.getResponseCode(); //200, 404 etc.
+            System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);
+            if(httpStatusCode==200)
+                return true;
+            else {
+                mensajeFinal="WebService NO DISPONIBLE: "+codigoeFinal;
+                codigoeFinal=httpStatusCode.toString();
+                return false;
 
-            return true;
 
+            }
         } catch (Exception e) {
             return false;
         } finally {
