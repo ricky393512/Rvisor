@@ -94,6 +94,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content"
             android:ems="10"
             android:hint="@string/hint_telefono"
+            android:maxLength="19"
             android:inputType="phone" />
     </android.support.design.widget.TextInputLayout>
 </LinearLayout>
@@ -125,6 +126,7 @@ tools:showIn="@layout/activity_consulta">
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:hint="@string/hint_nombre"
+                android:maxLength="15"
                 android:inputType="phone"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
@@ -154,6 +156,7 @@ tools:showIn="@layout/activity_consulta">
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:maxLength="4"
                 android:hint="Codigo ciudad:"
                 android:inputType="phone" />
         </android.support.design.widget.TextInputLayout>

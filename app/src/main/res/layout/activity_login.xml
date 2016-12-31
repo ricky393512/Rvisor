@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:hint="Clave de  Distribuidor"
                     android:inputType="number"
-                    android:maxLines="1"
+                    android:maxLength="5"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
@@ -58,6 +58,7 @@
                     android:imeActionLabel="@string/action_sign_in_short"
                     android:imeOptions="actionUnspecified"
                     android:inputType="number"
+                    android:maxLength="5"
                     android:singleLine="true" />
 
             </android.support.design.widget.TextInputLayout>
@@ -69,6 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
+                android:drawableLeft="@mipmap/ic_preppy"
                 android:textStyle="bold" />
 
         </LinearLayout>

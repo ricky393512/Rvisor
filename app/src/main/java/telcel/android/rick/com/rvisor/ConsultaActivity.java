@@ -6,7 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,6 +42,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -653,13 +658,21 @@ public class ConsultaActivity extends AppCompatActivity {
                         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         ;
 */
+
         Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        Bitmap bm = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_bien);
 
         builder
                 .setContentTitle(titulo)
                 .setContentText(contenido +" Telefono: "+telefono+" monto:"+monto)
-                .setContentInfo("Informacion activacion")
-                .setSmallIcon(R.drawable.ic_telefono);
+                .setContentInfo("mas informacion de la activacion")
+                .setSmallIcon(R.mipmap.ic_telefononube)
+                .setWhen(System.currentTimeMillis())
+                .setLargeIcon(bm)
+        .setTicker("Activacion exitosa");
+
+        ;
+
                 //.setLargeIcon(bitmapIcon);
 
          new Notification.BigTextStyle(builder)
@@ -677,6 +690,7 @@ public class ConsultaActivity extends AppCompatActivity {
 // API 11 o mayor
         builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
         builder.setLights(Color.YELLOW, 300, 100);
+      //  builder.setVibrate(new long[] {0,100,200,300});
 
         // Construir la notificación y emitirla
         notifyMgr.notify(id, builder.build());
