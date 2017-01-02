@@ -27,7 +27,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Clave Distribuidor"
+            android:text="@string/hint_distribuidor"
             android:layout_gravity="left"
             />
 
@@ -48,7 +48,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Clave Vendedor"
+            android:text="@string/hint_vendedor"
             android:layout_gravity="left"
 
             />
@@ -73,7 +73,7 @@ tools:showIn="@layout/activity_consulta">
     android:layout_below="@+id/area_tabla"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+    android:layout_marginTop="20dp"
     android:orientation="horizontal">
 
     <Button android:id="@+id/btnIccid"
@@ -83,7 +83,7 @@ tools:showIn="@layout/activity_consulta">
         android:layout_height="wrap_content" />
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/til_telefono"
+        android:id="@+id/til_iccid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="32dp">
@@ -93,7 +93,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/hint_telefono"
+            android:hint="@string/hint_iccid"
             android:maxLength="19"
             android:inputType="phone" />
     </android.support.design.widget.TextInputLayout>
@@ -104,7 +104,6 @@ tools:showIn="@layout/activity_consulta">
         android:id="@+id/area_imei"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:layout_below="@+id/area_iccid"
         android:orientation="horizontal">
 
@@ -115,7 +114,7 @@ tools:showIn="@layout/activity_consulta">
             android:layout_height="wrap_content" />
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/til_nombre"
+            android:id="@+id/til_imei"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="32dp">
@@ -125,9 +124,9 @@ tools:showIn="@layout/activity_consulta">
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="@string/hint_nombre"
+                android:hint="@string/hint_imei"
                 android:maxLength="15"
-                android:inputType="phone"
+                android:inputType="number"
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>
@@ -155,10 +154,9 @@ tools:showIn="@layout/activity_consulta">
                 android:id="@+id/campo_ciudad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:maxLength="4"
-                android:hint="Codigo ciudad:"
-                android:inputType="phone" />
+                android:maxLength="2"
+                android:hint="@string/hint_codigo_ciudad"
+                android:inputType="number" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 

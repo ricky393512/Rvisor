@@ -62,13 +62,13 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-// TODO: attempt authentication against a network service.
+
 //WebService - Opciones
 
 
 
 
-            listaProductos = new ArrayList<TipoProducto>();
+            listaProductos = new ArrayList<>();
 
         if (!isAvailableWSDL(URL)) {
             System.out.println("NO esta arriba");
@@ -92,7 +92,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
         try {
             ht.call(SOAP_ACTION, envelope);
-        } catch (IOException e) {
+        } catch (IOException e ) {
             e.printStackTrace();
         } catch (XmlPullParserException e) {
             e.printStackTrace();
@@ -127,7 +127,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
 
 
-        List<SoapObject> result = new ArrayList<SoapObject>();
+        List<SoapObject> result = new ArrayList<>();
         if (resSoap != null) {
             SoapObject list = ((SoapObject) resSoap);
 
@@ -170,8 +170,8 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected void onPostExecute(final Boolean success) {
-        if(success==false){
-            Toast.makeText(context, "Usuario No Valido", Toast.LENGTH_LONG).show();
+        if(!success){
+          //  Toast.makeText(context, "Usuario No Valido", Toast.LENGTH_LONG).show();
 
 
             if (!isAvailableWSDL(URL)) {
@@ -198,9 +198,9 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
         }
         else{
-            Toast.makeText(context, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
+           // Toast.makeText(context, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
            // txtResultado.setText("Hola");
-            List<String> nombreProductos = new ArrayList<String>();
+            List<String> nombreProductos = new ArrayList<>();
 
             for(TipoProducto t:listaProductos){
                 nombreProductos.add(t.getDescripcion());

@@ -10,14 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="telcel.android.rick.com.rvisor.LoginActivity">
 
-    <!-- Login progress -->
-    <ProgressBar
-        android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
+
 
     <ScrollView
         android:id="@+id/login_form"
@@ -38,10 +31,11 @@
                     android:id="@+id/distribuidor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Clave de  Distribuidor"
+                    android:hint="@string/hint_distribuidor"
                     android:inputType="number"
                     android:maxLength="5"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                     />
 
             </android.support.design.widget.TextInputLayout>
 
@@ -53,10 +47,8 @@
                     android:id="@+id/vendedor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Clave vendedor"
+                    android:hint="@string/hint_vendedor"
                     android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_sign_in_short"
-                    android:imeOptions="actionUnspecified"
                     android:inputType="number"
                     android:maxLength="5"
                     android:singleLine="true" />
@@ -69,8 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in"
-
+                android:text="@string/accion_ingresar"
                 android:textStyle="bold" />
 
         </LinearLayout>
