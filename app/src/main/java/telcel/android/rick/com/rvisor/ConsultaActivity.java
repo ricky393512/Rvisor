@@ -2,6 +2,7 @@ package telcel.android.rick.com.rvisor;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -207,12 +208,17 @@ public class ConsultaActivity extends AppCompatActivity {
                 final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
                 final String METHOD_NAME = "realiza_activacion";
                 final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
+                private ProgressDialog progreso;
 
 
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
-
+                    progreso = new ProgressDialog(ConsultaActivity.this);
+                    progreso.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    progreso.setMessage("Activando ............");
+                    progreso.setCancelable(false);
+                    progreso.show();
 
                 }
 
@@ -304,6 +310,9 @@ public class ConsultaActivity extends AppCompatActivity {
 
                 @Override
                 protected void onPostExecute(final Boolean success) {
+
+                    progreso.dismiss();
+
                     if (success == false) {
                         ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
 
