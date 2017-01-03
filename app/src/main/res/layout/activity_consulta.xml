@@ -86,7 +86,13 @@ tools:showIn="@layout/activity_consulta">
         android:id="@+id/til_iccid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="32dp">
+        android:layout_marginLeft="32dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="19"
+        app:counterOverflowTextAppearance="@style/CounterOverFlow"
+        app:counterTextAppearance="@style/Counter"
+        app:errorEnabled="true"
+        >
 
         <EditText
             android:id="@+id/campo_iccid"
@@ -117,7 +123,13 @@ tools:showIn="@layout/activity_consulta">
             android:id="@+id/til_imei"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp">
+            android:layout_marginLeft="32dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="15"
+            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+            app:counterTextAppearance="@style/Counter"
+            app:errorEnabled="true"
+            >
 
             <EditText
                 android:id="@+id/campo_imei"
@@ -148,7 +160,13 @@ tools:showIn="@layout/activity_consulta">
             android:id="@+id/til_ciudad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="32dp">
+            android:layout_marginLeft="32dp"
+            app:counterEnabled="true"
+            app:counterMaxLength="2"
+            app:counterOverflowTextAppearance="@style/CounterOverFlow"
+            app:counterTextAppearance="@style/Counter"
+            app:errorEnabled="true"
+            >
 
             <EditText
                 android:id="@+id/campo_ciudad"
