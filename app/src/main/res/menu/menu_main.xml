@@ -5,6 +5,12 @@
 
 
     <item
+
         android:id="@+id/exit"  app:showAsAction="never" android:title="Salir">
     </item>
+    <item
+
+        android:id="@+id/versionRvisor"  app:showAsAction="never" android:title="Acerca de...">
+    </item>
 </menu>
+

@@ -80,6 +80,25 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    public void acercaDe(){
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(ConsultaActivity.this);
+
+        View child = getLayoutInflater().inflate(R.layout.midialogo, null);
+        builder.setView(child);
+        builder.setMessage("Version 1.0")
+                .setTitle("Acerca de ...")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+
+         builder.create();
+        builder.show();
+    }
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -87,6 +106,14 @@ public class ConsultaActivity extends AppCompatActivity {
             case R.id.exit:
                 salir();
                 return (true);
+
+
+            case R.id.versionRvisor:
+                acercaDe();
+                return (true);
+
+
+
         }
         return (super.onOptionsItemSelected(item));
     }
