@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity{
 
         if (TextUtils.isEmpty(distribuidor)) {
 
-           mClaveDistribuidorView.setError(getString(R.string.error_distribuidor_vacio));
+            mClaveDistribuidorView.setError(getString(R.string.error_distribuidor_vacio));
             focusView = mClaveDistribuidorView;
             cancel = true;
         }
@@ -155,7 +155,7 @@ public class LoginActivity extends AppCompatActivity{
         if (cancel) {
             focusView.requestFocus();
         } else {
-          //  showProgress(true);
+            //  showProgress(true);
             mAuthTask = new UserLoginTask(distribuidor, vendedor);
             mAuthTask.execute((Void) null);
         }
@@ -175,8 +175,8 @@ public class LoginActivity extends AppCompatActivity{
         final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_autenticacion\"";
         final String distribuidor;
         final String vendedor;
-         SoapPrimitive codigo=   null;
-         SoapPrimitive  mensaje=    null;
+        SoapPrimitive codigo=   null;
+        SoapPrimitive  mensaje=    null;
         private ProgressDialog progreso;
 
 
@@ -202,7 +202,7 @@ public class LoginActivity extends AppCompatActivity{
 
             if (!isAvailableWSDL(URL)) {
 
-                Log.i("RVISOR MOBILE", "El WS "+URL+" no esta en linea ");
+                Log.e("RVISOR MOBILE", "El WS "+URL+" no esta en linea ");
                 return false;
             }
 
@@ -238,13 +238,13 @@ public class LoginActivity extends AppCompatActivity{
             SoapObject soap = (SoapObject) envelope.bodyIn;
             SoapObject soapResult = (SoapObject)soap.getProperty(0);
             Log.i("RVISOR MOBILE","TOTAL PROPIEDADES S: "+soapResult.getPropertyCount());
-           if (soapResult != null) {
+            if (soapResult != null) {
                 SoapObject soapResult1 = (SoapObject)soap.getProperty(0);
                 Log.i("RVISOR MOBILE","Propiedad ---"+soapResult1.getPropertyCount());
-               codigo=    (SoapPrimitive) soapResult1.getProperty(0);
-               mensaje=    (SoapPrimitive) soapResult1.getProperty(1);
-               mensajeFinal=mensaje.toString();
-               codigoeFinal=codigo.toString();
+                codigo=    (SoapPrimitive) soapResult1.getProperty(0);
+                mensaje=    (SoapPrimitive) soapResult1.getProperty(1);
+                mensajeFinal=mensaje.toString();
+                codigoeFinal=codigo.toString();
                 Log.i("RVISOR MOBILE","codigo respuesta WS "+codigo.toString());
                 Log.i("RVISOR MOBILE","mensaje respuesta WS "+mensaje.toString());
             }
@@ -260,7 +260,7 @@ public class LoginActivity extends AppCompatActivity{
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             progreso.dismiss();
-           // showProgress(false);
+            // showProgress(false);
             if (success) {
                 Log.i("RVISOR MOBILE", "Entro a  guardar la session con el distribuidor: "+distribuidor+" y vendedor "+vendedor);
                 session.createLoginSession(distribuidor, vendedor);
@@ -269,24 +269,24 @@ public class LoginActivity extends AppCompatActivity{
                 //  Credencial credencial = new Credencial();
                 //  credencial.setClaveVendedor(vendedor);
                 // credencial.setClaveDistribuidor(distribuidor);
-            //    intent.putExtra("credencial", credencial);
+                //    intent.putExtra("credencial", credencial);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
 
             } else {
-                        if(mensajeFinal.toString().startsWith("Clave de distribuidor")){
+                if(mensajeFinal.toString().startsWith("Clave de distribuidor")){
 
-                            mClaveDistribuidorView.setError(getString(R.string.error_distribuidor_incorrecto));
-                            mClaveDistribuidorView.requestFocus();
-                   }else if (mensajeFinal.toString().startsWith("Clave de vendedor")) {
-                            mClaveVendedorView.setError(getString(R.string.error_vendedor_incorrecto));
-                            mClaveVendedorView.requestFocus();
+                    mClaveDistribuidorView.setError(getString(R.string.error_distribuidor_incorrecto));
+                    mClaveDistribuidorView.requestFocus();
+                }else if (mensajeFinal.toString().startsWith("Clave de vendedor")) {
+                    mClaveVendedorView.setError(getString(R.string.error_vendedor_incorrecto));
+                    mClaveVendedorView.requestFocus();
 
-                        }else if (mensajeFinal.toString().startsWith("WebService NO DISPONIBLE:")){
-                            showAlertDialog(LoginActivity.this, getString(R.string.error_ws_nodisponible),
-                                    mensajeFinal, false);
-                        }
+                }else if (mensajeFinal.toString().startsWith("WebService")){
+                    showAlertDialog(LoginActivity.this, getString(R.string.error_ws_nodisponible),
+                            mensajeFinal, false);
+                }
 
 
             }
@@ -296,7 +296,7 @@ public class LoginActivity extends AppCompatActivity{
         protected void onCancelled() {
             mAuthTask = null;
             progreso.dismiss();
-           // showProgress(false);
+            // showProgress(false);
         }
     }
 
@@ -375,10 +375,10 @@ public class LoginActivity extends AppCompatActivity{
             Log.d("RVISOR MOBILE", "El WS me responde un codigo "+httpStatusCode);
 
             if(httpStatusCode==200)
-            return true;
+                return true;
             else {
                 Log.e("RVISOR MOBILE", "No  esta respondiendo correctamente me manda un codigo "+httpStatusCode);
-                mensajeFinal=getString(R.string.error_ws_nodisponible)+" : "+codigoeFinal;
+                mensajeFinal="WebService: "+codigoeFinal;
                 codigoeFinal=httpStatusCode.toString();
                 return false;
 
@@ -386,7 +386,7 @@ public class LoginActivity extends AppCompatActivity{
 
         } catch (Exception e) {
             Log.e("RVISOR MOBILE", "No levante "+e.getMessage());
-            mensajeFinal=getString(R.string.error_ws_nodisponible)+" : "+e.getMessage();
+            mensajeFinal="WebService: "+e.getMessage();
             codigoeFinal=httpStatusCode.toString();
             return false;
         } finally {

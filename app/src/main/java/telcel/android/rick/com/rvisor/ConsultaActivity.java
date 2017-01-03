@@ -10,8 +10,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,7 +41,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -165,15 +162,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
     public void  realizaActivacion(){
-
-
-
-
         final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
-
-        System.out.println("Realizadooooooooooooooooooo Validacobes"+tipoProducto.getDescripcion());
-
-
 
         if (validacionActivacion()) {
             // There was an error; don't attempt login and focus the first
@@ -232,14 +221,13 @@ public class ConsultaActivity extends AppCompatActivity {
                     // Create the outgoing message
                     SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
                     // Set Parameter
-                    System.out.println(" im eie " + activacion.getImei());
                     requestObject.addProperty("imei", activacion.getImei());
                     requestObject.addProperty("iccid", activacion.getIccid());
                     requestObject.addProperty("cod_ciudad", activacion.getCodigoCiudad());
                     requestObject.addProperty("cod_distribuidor", activacion.getCodigoDistribuidor());
                     requestObject.addProperty("cod_vendedor", activacion.getCodigoVendedor());
                     requestObject.addProperty("id_tipo_producto", tipoProducto.getIdProducto());
-                    requestObject.addProperty("id_modalidad_activacion", activacion.getIdModalidad());
+                    requestObject.addProperty("id_modalidad_activacion", tipoProducto.getIdModalidad());
 
 
                     // Create soap envelop .use version 1.1 of soap
@@ -271,36 +259,23 @@ public class ConsultaActivity extends AppCompatActivity {
                         Log.i("TOTAL PROPIEDADES S: ", "" + soapResult.getPropertyCount());
                         SoapPrimitive codigo = (SoapPrimitive) soapResult.getProperty(0);
                         SoapPrimitive mensaje = (SoapPrimitive) soapResult.getProperty(1);
-                        SoapPrimitive monto = (SoapPrimitive) soapResult.getProperty(2);
-                        SoapPrimitive telefono = (SoapPrimitive) soapResult.getProperty(3);
-
                         codigoAct = codigo.toString();
                         mensajeAct = mensaje.toString();
-                        montoAct= monto.toString();
-                        telefonoAct= telefono.toString();
 
-                 /*   for(int i=0;i<soapResult.getPropertyCount();i++)
-                    {
-                        String result = null;
-                        SoapPrimitive so =null;
-                        try {
-                            so=    (SoapPrimitive) soapResult.getProperty(i);
+                        if(codigoAct.equals("100")){
+                            SoapPrimitive monto = (SoapPrimitive) soapResult.getProperty(2);
+                            SoapPrimitive telefono = (SoapPrimitive) soapResult.getProperty(3);
+                            montoAct= monto.toString();
+                            telefonoAct= telefono.toString();
 
-                            result = so.toString();
-                        }catch(java.lang.ClassCastException e){
-                            Log.i("Error falta un campo: ",e.getMessage());
-                            continue;
+                            return true;
                         }
 
-                        Log.i("Resultado S: ",result);
-
-                    }
-                   */
-
-                        if(codigoAct.equals("100"))
-                            return true;
                         else
                             return false;
+
+
+
 
                     }
 
@@ -313,36 +288,37 @@ public class ConsultaActivity extends AppCompatActivity {
 
                     progreso.dismiss();
 
-                    if (success == false) {
-                        ///   Toast.makeText(ConsultaActivity.this, "Usuario No Valido", Toast.LENGTH_LONG).show();
-
+                    if (!success) {
                         AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
                         alert.setTitle("Error !!!");
                         alert.setMessage("Se ha presentado el siguiente problema: \n"
-                                + mensajeAct
-
-
+                                + mensajeAct+
+                                " con codigo "+codigoAct
 
                         );
-                        alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
+                        alert.setPositiveButton("REGRESAR A LA ACTIVACION", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                                finish();
-                                startActivity(getIntent());
+                        //        finish();
+                          //      startActivity(getIntent());
+                                dialog.dismiss();
+
                             }
                         });
                         AlertDialog dialog = alert.create();
-                        dialog.setCancelable(false);
+
                         dialog.show();
 
 
+                        notificationError(1, R.drawable.ic_telefono, "Error de Activacion", "Se ha presentado el siguiente problema con la activacion: \n"
+                                + mensajeAct
+                                +"\n"
+                                );
 
 
 
                     } else {
-                        // Toast.makeText(ConsultaActivity.this, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
-
                         AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
                         alert.setTitle("Atención");
                         alert.setMessage("Se ha realizado la activacion correctamente \n"
@@ -415,38 +391,24 @@ public class ConsultaActivity extends AppCompatActivity {
         Button btnProducto = (Button) findViewById(R.id.btnProducto);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        /*KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
 
-        KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
-        KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
-        lock.disableKeyguard();
-
-        lock.disableKeyguard();
-
-        KeyguardManager keyguardManager = (KeyguardManager)getSystemService(Activity.KEYGUARD_SERVICE);
-        KeyguardManager.KeyguardLock lock = keyguardManager.newKeyguardLock(KEYGUARD_SERVICE);
-
-         lock.reenableKeyguard();
-*/
         campo_imei = (EditText) findViewById(R.id.campo_imei);
         campo_iccid = (EditText) findViewById(R.id.campo_iccid);
         campo_codigo_ciudad = (EditText) findViewById(R.id.campo_ciudad);
         txtResultado = (TextView) findViewById(R.id.txtResultado);
 
-         //    credencial = (Credencial) getIntent().getExtras().getSerializable("credencial");
 
         HashMap<String,String> mapaCrendenciales= session.getUserDetails();
 
-            credencial.setClaveDistribuidor(mapaCrendenciales.get("distribuidor"));
-            credencial.setClaveVendedor(mapaCrendenciales.get("vendedor"));
+        credencial.setClaveDistribuidor(mapaCrendenciales.get("distribuidor"));
+        credencial.setClaveVendedor(mapaCrendenciales.get("vendedor"));
 
-            txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
-            txtClaveDistribuidor = (TextView) findViewById(R.id.txtClaveDistribuidor);
+        txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
+        txtClaveDistribuidor = (TextView) findViewById(R.id.txtClaveDistribuidor);
 
 
-            txtClaveVendedor.setText(credencial.getClaveVendedor());
-            txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
+        txtClaveVendedor.setText(credencial.getClaveVendedor());
+        txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
 
 
         btnProducto.setOnClickListener(new View.OnClickListener() {
@@ -475,7 +437,7 @@ public class ConsultaActivity extends AppCompatActivity {
                 realizaActivacion();
 
 
-            //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
+                //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
 
 
 
@@ -504,39 +466,40 @@ public class ConsultaActivity extends AppCompatActivity {
         new AsyncTask<String, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
-             //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
-            // boolean valor = isAvailableWSDL(URL);
+                //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
+                // boolean valor = isAvailableWSDL(URL);
 
 
-              //  return valor ;
+                //  return valor ;
 
                 if (!isAvailableWSDL(URL)) {
                     System.out.println("NO esta arriba LOGin WSSSSSSSSSSSSSS");
 
                     return false;
                 } else
-                  return true;
+                    return true;
 
 
             }
 
             @Override
             protected void onPostExecute(Boolean result) {
-               // progress.dismiss();
+                // progress.dismiss();
                 if(!result){
                     AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
                     alert.setTitle("Atención");
                     alert.setMessage("El WS de catalogos no esta disponible \n"
                             + "Favor de comunicarse con el area comercial\n");
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    alert.setPositiveButton("Oprimir para intentar cargar nuevamente Catalogo", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                         //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                            //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
                             finish();
                             startActivity(getIntent());
                         }
                     });
                     AlertDialog dialog = alert.create();
+                    dialog.setCancelable(false);
                     dialog.show();
                 }else{
 
@@ -546,10 +509,10 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
         Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
-        //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
 
-    coopelWS = new CoopelWS(getApplicationContext(), mySpinner, credencial.getClaveDistribuidor());
-    coopelWS.execute();
+
+        coopelWS = new CoopelWS(getApplicationContext(), mySpinner, credencial.getClaveDistribuidor());
+        coopelWS.execute();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -576,7 +539,7 @@ public class ConsultaActivity extends AppCompatActivity {
                     alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                          //  startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                            //  startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
                             finish();
                             startActivity(getIntent());
                         }
@@ -636,12 +599,6 @@ public class ConsultaActivity extends AppCompatActivity {
                 campo_imei.setText(data.getStringExtra("SCAN_RESULT"));
             else if (requestCode == 2)
                 campo_iccid.setText(data.getStringExtra("SCAN_RESULT"));
-            // En asyncTask
-            // ISBN.callISBNService();
-         /*   if (pref.getBoolean("checkServer", true)) { // Sensores
-                ISBNTask tarea = new ISBNTask();
-                tarea.execute(0);
-            }*/
         }
     }
 
@@ -678,13 +635,13 @@ public class ConsultaActivity extends AppCompatActivity {
                 .setSmallIcon(R.mipmap.ic_telefononube)
                 .setWhen(System.currentTimeMillis())
                 .setLargeIcon(bm)
-        .setTicker("Activacion exitosa");
+                .setTicker("Activacion exitosa");
 
         ;
+        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+        //.setLargeIcon(bitmapIcon);
 
-                //.setLargeIcon(bitmapIcon);
-
-         new Notification.BigTextStyle(builder)
+        new Notification.BigTextStyle(builder)
                 .bigText(contenido +" Telefono: "+telefono+" monto:"+monto)
                 .setBigContentTitle("Mensaje de Activacion")
                 .setSummaryText("Resultado de Activacion")
@@ -699,13 +656,52 @@ public class ConsultaActivity extends AppCompatActivity {
 // API 11 o mayor
         builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
         builder.setLights(Color.YELLOW, 300, 100);
-      //  builder.setVibrate(new long[] {0,100,200,300});
+        //  builder.setVibrate(new long[] {0,100,200,300});
 
         // Construir la notificación y emitirla
         notifyMgr.notify(id, builder.build());
     }
 
+    public void notificationError(int id, int iconId, String titulo, String contenido) {
+        notifyMgr = (NotificationManager) this
+                .getSystemService(Context.NOTIFICATION_SERVICE);
 
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        Bitmap bm = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_mal);
+
+        builder
+                .setContentTitle(titulo)
+                .setContentText(contenido)
+                .setContentInfo("mas informacion de la activacion")
+                .setSmallIcon(R.mipmap.ic_telefononube)
+                .setWhen(System.currentTimeMillis())
+                .setLargeIcon(bm)
+                .setTicker("Error en la Activacion");
+
+        ;
+
+        //.setLargeIcon(bitmapIcon);
+
+        new Notification.BigTextStyle(builder)
+                .bigText(contenido)
+                .setBigContentTitle("Mensaje de Activacion")
+                .setSummaryText("Resultado de Activacion")
+                .build();
+
+
+        // Crear intent
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+
+// API 11 o mayor
+        builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
+        builder.setLights(Color.RED, 300, 100);
+        //  builder.setVibrate(new long[] {0,100,200,300});
+        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+        // Construir la notificación y emitirla
+        notifyMgr.notify(id, builder.build());
+    }
     public boolean isAvailableWSDL(String url) {
         HttpURLConnection c = null;
         Integer httpStatusCode=0;

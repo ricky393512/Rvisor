@@ -32,11 +32,6 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     private TextView txtResultado;
     private List<TipoProducto> listaProductos;
     private Spinner mySpinner;
-    /*final String NAMESPACE = "http://hello_webservice/";
-    final String URL="http://10.131.5.40:8080/HelloWorldWS/hello?wsdl";
-    final String METHOD_NAME = "getProductos";
-    final String SOAP_ACTION = "http://hello_webservice/WSConsultaLdap/getProductos";
-*/
     final String NAMESPACE = "http://ws.telcel.com/";
     final String URL="https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     final String METHOD_NAME = "listado_productos";
@@ -62,24 +57,17 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
-
-//WebService - Opciones
-
-
-
-
-            listaProductos = new ArrayList<>();
+        listaProductos = new ArrayList<>();
 
         if (!isAvailableWSDL(URL)) {
-            System.out.println("NO esta arriba");
-
+            Log.e("RVISOR MOBILE", "El WS "+URL+" no esta en linea ");
             return false;
         }
 
         // Create the outgoing message
         SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
         // Set Parameter
-       requestObject.addProperty("cod_distribuidor",codigoDistribuidor);
+        requestObject.addProperty("cod_distribuidor",codigoDistribuidor);
         // Create soap envelop .use version 1.1 of soap
         SoapSerializationEnvelope envelope =
                 new SoapSerializationEnvelope(SoapEnvelope.VER11);
@@ -99,33 +87,9 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
         }
 
         String theXmlString = ht.responseDump;
-        Log.i("Resultado T: ",theXmlString);
-     /*   SoapObject soap = (SoapObject) envelope.bodyIn;
-        SoapObject soapResult = (SoapObject)soap.getProperty(0);
-        Log.i("TOTAL PROPIEDADES S: ",""+soapResult.getPropertyCount());
-        for(int i=0;i<soapResult.getPropertyCount();i++)
-            {
-                String result = null;
-                SoapPrimitive so =null;
-                try {
-                    so=    (SoapPrimitive) soapResult.getProperty(i);
+        Log.i("Resultado T", "La respuesta del WS "+theXmlString);
 
-                    result = so.toString();
-                }catch(java.lang.ClassCastException e){
-                    Log.i("Error falta un campo: ",e.getMessage());
-                    continue;
-                }
-                //String result1 = so.getProperty(1).toString();
-                //here, you can get data from xml using so.getProperty("PublicationID")
-                //or the other tag in xml file.
-                // String result = (String)so.getProperty("apellidos");
-                Log.i("Resultado S: ",result);
-                //Log.i("Resultado S1: ",result1);
-            }
-*/
-      SoapObject resSoap = (SoapObject) envelope.bodyIn;
-
-
+        SoapObject resSoap = (SoapObject) envelope.bodyIn;
 
         List<SoapObject> result = new ArrayList<>();
         if (resSoap != null) {
@@ -139,26 +103,19 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
 
 
         TipoProducto[] listaP = null;
-     listaP = new TipoProducto[resSoap.getPropertyCount()];
+        listaP = new TipoProducto[resSoap.getPropertyCount()];
 
         for (int i = 0; i < listaP.length; i++)
         {
             SoapObject ic = (SoapObject)resSoap.getProperty(i);
 
             TipoProducto tp = new TipoProducto();
-            Log.i("Debbbbb", "id  "+ic.getProperty(0).toString());
+            //    Log.i("Debbbbb", "id  "+ic.getProperty(0).toString());
             tp.setDescripcion(ic.getProperty(0).toString());
             tp.setIdModalidad(Integer.parseInt(ic.getProperty(1).toString()));
-            tp.setIdProducto(Integer.parseInt(ic.getProperty(1).toString()));
-    //        tp.setId(ic.getProperty(0).toString());;
-           // Log.i("Debbbbb1112", "nombre  "+ic.getProperty(1).toString());
-      //     tp.setNombre(ic.getProperty(1).toString());
-
-
-          //  Log.i("Debug", "Us  "+tp.getId()+" ac  --> "+tp.getNombre());
-
-         listaP[i] = tp;
-           listaProductos.add(tp);
+            tp.setIdProducto(Integer.parseInt(ic.getProperty(2).toString()));
+            listaP[i] = tp;
+            listaProductos.add(tp);
 
         }
 
@@ -171,51 +128,27 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(final Boolean success) {
         if(!success){
-          //  Toast.makeText(context, "Usuario No Valido", Toast.LENGTH_LONG).show();
-
 
             if (!isAvailableWSDL(URL)) {
-                System.out.println("NO esta arriba");
-            //    mostrarAlerta();
-           //     return false;
+                Log.e("RVISOR MOBILE", "El WS "+URL+" no esta en linea ");
+
             }
-
-
-
             List<TipoProducto> listTP = new ArrayList<>();
             TipoProducto tp1 = new TipoProducto();
-
-//            tp1.setIdModalidad(0);
-            tp1.setDescripcion("NO DISPONIBLE");
-
+            tp1.setDescripcion("NO DISPONIBLE WEB SERVICES  OPRIMIR BOTON PRODUCTOS PARA RECARGAR CATALOGO DE PRODUCTOS");
             listTP.add(tp1);
-
             ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row,  listTP);
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mySpinner.setAdapter(adapter);
-//              mySpinner.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
-
-
         }
         else{
-           // Toast.makeText(context, "Acceso Concedido: ", Toast.LENGTH_LONG).show();
-           // txtResultado.setText("Hola");
             List<String> nombreProductos = new ArrayList<>();
-
             for(TipoProducto t:listaProductos){
                 nombreProductos.add(t.getDescripcion());
             }
-
-
             ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, listaProductos);
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mySpinner.setAdapter(adapter);
-            //mySpinner.setAdapter(new ArrayAdapter<String>(context, R.layout.spinner_style, nombreProductos));
-
-
-
-
-                    //this, R.layout., nombreProductos)));
         }
 
 
@@ -239,7 +172,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
             c.setReadTimeout(1000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
-            System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);
+            Log.i("RVISOR MOBILE", "Arriba !!!!!!!!!!"+httpStatusCode);
             if(httpStatusCode==200)
                 return true;
             else {
