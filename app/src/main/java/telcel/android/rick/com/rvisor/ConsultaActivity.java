@@ -160,6 +160,35 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    public void confirmaAcciones(){
+        AlertDialog.Builder builder =
+                new AlertDialog.Builder(ConsultaActivity.this);
+
+        View child = getLayoutInflater().inflate(R.layout.midialogo, null);
+        builder.setView(child);
+
+        builder.setMessage("¿Estas seguro de mandar la activación?")
+                .setTitle("Confirmacion")
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener()  {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i("Dialogos", "Confirmacion Aceptada.");
+                      dialog.cancel();
+                        realizaActivacion();
+                    }
+                })
+                .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.i("Dialogos", "Confirmacion Cancelada.");
+                        dialog.cancel();
+                    }
+                });
+
+         builder.create();
+        builder.show();
+
+    }
+
+
 
     public void  realizaActivacion(){
         final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
@@ -434,8 +463,8 @@ public class ConsultaActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // And to get the actual User object that was selected, you can do this.
                 //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
-                realizaActivacion();
-
+               // realizaActivacion();
+                confirmaAcciones();
 
                 //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
 
