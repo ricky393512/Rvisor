@@ -28,4 +28,8 @@
     <style name="CounterOverFlow" parent="TextAppearance.Design.Counter.Overflow">
         <item name="android:textColor">#FF7043</item>
     </style>
+
+    <style name="Error" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">#FF9800</item>
+    </style>
 </resources>

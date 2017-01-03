@@ -135,6 +135,7 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
             }
             List<TipoProducto> listTP = new ArrayList<>();
             TipoProducto tp1 = new TipoProducto();
+            tp1.setIdProducto(-1);
             tp1.setDescripcion("NO DISPONIBLE WEB SERVICES  OPRIMIR BOTON PRODUCTOS PARA RECARGAR CATALOGO DE PRODUCTOS");
             listTP.add(tp1);
             ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row,  listTP);

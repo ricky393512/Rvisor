@@ -221,6 +221,33 @@ public class ConsultaActivity extends AppCompatActivity {
 
     public void  realizaActivacion(){
         final TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
+        Log.i("RVISOR MOBILE","VAlor de producto seleccionado !!!"+tipoProducto.getIdProducto());
+        if(tipoProducto.getIdProducto()==-1){
+            Log.e("RVISOR MOBILE","VAlor -1 de producto seleccionado !!!");
+            AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
+            alert.setTitle("Error !!!");
+            alert.setMessage("Se ha presentado el siguiente problema con el WS de Catalogos \n"+
+
+                    "Favor de recargar el catalogo para que puedas elegir un producto valido"
+
+            );
+            alert.setPositiveButton("REGRESAR A LA ACTIVACION", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
+                    //        finish();
+                    //      startActivity(getIntent());
+                    dialog.dismiss();
+
+                }
+            });
+            AlertDialog dialog = alert.create();
+
+            dialog.show();
+
+            return;
+        }
+
 
         if (validacionActivacion()) {
             // There was an error; don't attempt login and focus the first
@@ -541,7 +568,7 @@ public class ConsultaActivity extends AppCompatActivity {
             protected void onPostExecute(Boolean result) {
                 // progress.dismiss();
                 if(!result){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
                     alert.setTitle("Atención");
                     alert.setMessage("El WS de catalogos no esta disponible \n"
                             + "Favor de comunicarse con el area comercial\n");
@@ -549,8 +576,9 @@ public class ConsultaActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //  startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                            finish();
-                            startActivity(getIntent());
+                           // finish();
+                           // startActivity(getIntent());
+                            dialog.dismiss();
                         }
                     });
                     AlertDialog dialog = alert.create();
