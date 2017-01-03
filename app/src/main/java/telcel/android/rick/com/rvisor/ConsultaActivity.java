@@ -10,6 +10,8 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -491,6 +493,7 @@ public class ConsultaActivity extends AppCompatActivity {
                 // And to get the actual User object that was selected, you can do this.
                 //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
                // realizaActivacion();
+                if(estaConectado())
                 confirmaAcciones();
 
                 //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
@@ -835,4 +838,65 @@ public class ConsultaActivity extends AppCompatActivity {
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
     }
+
+
+
+    protected Boolean estaConectado(){
+        if(conectadoWifi()){
+            return true;
+        }else{
+            if(conectadoRedMovil()){
+                return true;
+            }else{
+                showAlertDialog(ConsultaActivity.this, getString(R.string.error_titulo_conexion_nodisponible),
+                        getString(R.string.error_conexion_nodisponible), false);
+                return false;
+            }
+        }
+    }
+
+    protected Boolean conectadoWifi(){
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            if (info != null) {
+                if (info.isConnected()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    protected Boolean conectadoRedMovil(){
+        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivity != null) {
+            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+            if (info != null) {
+                if (info.isConnected()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void showAlertDialog(Context context, String title, String message, Boolean status) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
+        alert.setTitle(title);
+        alert.setMessage(message+ "\n"
+        );
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                finish();
+                startActivity(getIntent());
+            }
+        });
+        AlertDialog dialog = alert.create();
+        dialog.show();
+    }
+
+
 }
