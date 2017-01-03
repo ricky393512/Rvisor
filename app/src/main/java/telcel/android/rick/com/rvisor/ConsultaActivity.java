@@ -521,57 +521,7 @@ public class ConsultaActivity extends AppCompatActivity {
         });
 
 
-
-        new AsyncTask<String, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(String... params) {
-                //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
-                // boolean valor = isAvailableWSDL(URL);
-
-
-                //  return valor ;
-
-                if (!isAvailableWSDL(URL)) {
-                    System.out.println("NO esta arriba LOGin WSSSSSSSSSSSSSS");
-
-                    return false;
-                } else
-                    return true;
-
-
-            }
-
-            @Override
-            protected void onPostExecute(Boolean result) {
-                // progress.dismiss();
-                if(!result){
-                    AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
-                    alert.setTitle("Atención");
-                    alert.setMessage("El WS de catalogos no esta disponible \n"
-                            + "Favor de comunicarse con el area comercial\n");
-                    alert.setPositiveButton("Oprimir para intentar cargar nuevamente Catalogo", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                            finish();
-                            startActivity(getIntent());
-                        }
-                    });
-                    AlertDialog dialog = alert.create();
-                    dialog.setCancelable(false);
-                    dialog.show();
-                }else{
-
-                }
-            }
-        }.execute("");
-
-
-        Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
-
-
-        coopelWS = new CoopelWS(getApplicationContext(), mySpinner, credencial.getClaveDistribuidor());
-        coopelWS.execute();
+        cargaCatalogoProductos();
 
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
