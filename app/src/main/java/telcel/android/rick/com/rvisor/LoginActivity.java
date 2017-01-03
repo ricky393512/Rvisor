@@ -9,7 +9,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -27,9 +26,8 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
+import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 
 /**
@@ -49,6 +47,7 @@ public class LoginActivity extends AppCompatActivity{
     private String codigoeFinal;
     String distribuidor;
     String vendedor;
+    private Conexion conexion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +56,8 @@ public class LoginActivity extends AppCompatActivity{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Session class instance
         session = new SessionManager(getApplicationContext());
+        conexion = new Conexion();
+
         boolean firstRun = session.isFirstRun();
 
         if (!firstRun) {
@@ -81,14 +82,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
 
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
 
-    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -96,7 +90,14 @@ public class LoginActivity extends AppCompatActivity{
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        estaConectado();
+       if(!estaConectado())
+           return;
+
+
+
+
+
+
         if (mAuthTask != null) {
             return;
         }
@@ -155,7 +156,6 @@ public class LoginActivity extends AppCompatActivity{
         if (cancel) {
             focusView.requestFocus();
         } else {
-            //  showProgress(true);
             mAuthTask = new UserLoginTask(distribuidor, vendedor);
             mAuthTask.execute((Void) null);
         }
@@ -266,10 +266,6 @@ public class LoginActivity extends AppCompatActivity{
                 session.createLoginSession(distribuidor, vendedor);
                 // Store values at the time of the login attempt.
                 Intent intent =               new Intent(getApplicationContext(),ConsultaActivity.class);
-                //  Credencial credencial = new Credencial();
-                //  credencial.setClaveVendedor(vendedor);
-                // credencial.setClaveDistribuidor(distribuidor);
-                //    intent.putExtra("credencial", credencial);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
@@ -316,6 +312,8 @@ public class LoginActivity extends AppCompatActivity{
         }
     }
 
+
+
     protected Boolean conectadoWifi(){
         ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
@@ -342,6 +340,7 @@ public class LoginActivity extends AppCompatActivity{
         return false;
     }
 
+
     public void showAlertDialog(Context context, String title, String message, Boolean status) {
         AlertDialog.Builder alert = new AlertDialog.Builder(LoginActivity.this,R.style.myDialog);
         alert.setTitle(title);
@@ -361,39 +360,20 @@ public class LoginActivity extends AppCompatActivity{
 
 
     public boolean isAvailableWSDL(String url) {
-        HttpURLConnection c = null;
         Integer httpStatusCode=0;
         try {
-            URL siteURL = new URL(url);
-            c = (HttpURLConnection) siteURL
-                    .openConnection();
-            c.setRequestMethod("HEAD");
-            c.setConnectTimeout(9000); //set timeout to 5 seconds
-            c.setReadTimeout(9000);
-            c.connect();
-            httpStatusCode = c.getResponseCode(); //200, 404 etc.
+            httpStatusCode= conexion.isAvailableWSDLCode(url);
             Log.d("RVISOR MOBILE", "El WS me responde un codigo "+httpStatusCode);
-
             if(httpStatusCode==200)
                 return true;
-            else {
-                Log.e("RVISOR MOBILE", "No  esta respondiendo correctamente me manda un codigo "+httpStatusCode);
-                mensajeFinal="WebService: "+codigoeFinal;
-                codigoeFinal=httpStatusCode.toString();
-                return false;
-
-            }
+            else
+               return false;
 
         } catch (Exception e) {
-            Log.e("RVISOR MOBILE", "No levante "+e.getMessage());
+            Log.e("RVISOR MOBILE", "No levanta el WS por "+e.getMessage());
             mensajeFinal="WebService: "+e.getMessage();
             codigoeFinal=httpStatusCode.toString();
             return false;
-        } finally {
-            if (c != null) {
-                c.disconnect();
-                c = null;
-            }
         }
 
     }

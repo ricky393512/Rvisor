@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.pojo.Activacion;
 import telcel.android.rick.com.rvisor.pojo.Credencial;
 import telcel.android.rick.com.rvisor.pojo.TipoProducto;
@@ -64,6 +65,7 @@ public class ConsultaActivity extends AppCompatActivity {
     private NotificationManager notifyMgr;
     final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     Credencial credencial= new Credencial();
+    private Conexion conexion;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -201,14 +203,14 @@ public class ConsultaActivity extends AppCompatActivity {
                 .setPositiveButton("Aceptar", new DialogInterface.OnClickListener()  {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("Dialogos", "Confirmacion Aceptada.");
-                      dialog.cancel();
+                      dialog.dismiss();
                         realizaActivacion();
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.i("Dialogos", "Confirmacion Cancelada.");
-                        dialog.cancel();
+                        dialog.dismiss();
                     }
                 });
 
@@ -468,6 +470,7 @@ public class ConsultaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta);
         session = new SessionManager(getApplicationContext());
+        conexion = new Conexion();
         session.firstRun();
         Button btnIccid = (Button) findViewById(R.id.btnIccid);
         Button btnImei = (Button) findViewById(R.id.btnImei);
@@ -520,9 +523,11 @@ public class ConsultaActivity extends AppCompatActivity {
                 // And to get the actual User object that was selected, you can do this.
                 //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
                // realizaActivacion();
-                if(estaConectado())
-                confirmaAcciones();
-
+                if(estaConectado()) {
+                    confirmaAcciones();
+                }else{
+                    Log.e("ERROR"," no esta conextado");
+                }
                 //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
 
 
@@ -868,8 +873,9 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                finish();
-                startActivity(getIntent());
+               // finish();
+               // startActivity(getIntent());
+                dialog.dismiss();
             }
         });
         AlertDialog dialog = alert.create();
