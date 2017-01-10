@@ -22,13 +22,21 @@ import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 
 import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
+import telcel.android.rick.com.rvisor.ws.HttpsTls12TransportSE;
+import telcel.android.rick.com.rvisor.ws.NoSSLv3SocketFactory;
 
 /**
  * A login screen that offers login via claveDistribuidor/claveVendedor
@@ -221,7 +229,51 @@ public class LoginActivity extends AppCompatActivity{
             // add the outgoing object as the request
             envelope.setOutputSoapObject(requestObject);
             envelope.dotNet = false;
-            HttpTransportSE ht = new HttpTransportSE(URL);
+           // HttpTransportSE ht = new HttpTransportSE(URL);
+
+            java.net.URL url= null;
+            try {
+                url = new URL(URL);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            String host = url.getHost();
+            int port = url.getPort();
+            String file = url.getPath();
+
+            if (port == -1) {
+                port = 443;
+            }
+
+            Log.d("RVISORMOVILE", "host -> " + host);
+            Log.d("RVISORMOVILE", "port -> " + port);
+            Log.d("RVISORMOVILE", "file -> " + file);
+
+
+
+//            HttpsTransportSE hts = new KeepAliveHttpsTransportSE()
+            SSLContext sslcontext = null;
+            try {
+                sslcontext = SSLContext.getInstance("TLSv1");
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                sslcontext.init(null,
+                        null,
+                        null);
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            }
+            SSLSocketFactory NoSSLv3Factory = new NoSSLv3SocketFactory(sslcontext.getSocketFactory());
+
+
+
+
+            HttpsTls12TransportSE ht =new HttpsTls12TransportSE(host, port, file, 10000);
+
+        //    ht.
             ht.debug = true;
             // call and Parse Result.
 

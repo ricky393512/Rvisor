@@ -120,4 +120,14 @@ public class Activacion implements KvmSerializable {
             default:break;
         }
     }
+
+    @Override
+    public String getInnerText() {
+        return null;
+    }
+
+    @Override
+    public void setInnerText(String s) {
+
+    }
 }

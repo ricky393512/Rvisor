@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">R-activador R7</string>
+    <string name="app_name">R7 activador mobile</string>
 
     <!-- Strings related to login -->
 
@@ -30,5 +30,6 @@
     <string name="accion_ingresar">Ingresar</string>
     <string name="accion_aceptar">Activar</string>
     <string name="accion_nueva">Nueva</string>
+    <string name="accion_consultar">Consultar</string>
 
 </resources>
