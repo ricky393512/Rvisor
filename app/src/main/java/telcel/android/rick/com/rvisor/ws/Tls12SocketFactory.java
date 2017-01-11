@@ -36,10 +36,12 @@ public class Tls12SocketFactory extends SSLSocketFactory {
     }
 
     public Tls12SocketFactory(SSLSocketFactory delegate) {
+        Log.e(LOG_TAG,"NEtroooooo ");
         if (delegate == null) {
             try {
-                Log.e(LOG_TAG,"Pdhdhdh ");
-                SSLContext context = SSLContext.getInstance("TLSv1");
+                Log.e(LOG_TAG,"es nulo ");
+                SSLContext context = SSLContext.getInstance("TLS");
+
                 context.init(null, null, null);
                 delegate = context.getSocketFactory();
             } catch (Exception ex) {
@@ -48,7 +50,12 @@ public class Tls12SocketFactory extends SSLSocketFactory {
             }
         }
 
-        disabledProtocols = new ArrayList<>(5);
+        Log.e(LOG_TAG,"Continuoooo ");
+
+        disabledProtocols = new ArrayList<>(6);
+
+        disabledProtocols.add("TLSv1");
+
         disabledProtocols.add("SSL");
         disabledProtocols.add("SSLv1");
         disabledProtocols.add("SSLv3");
