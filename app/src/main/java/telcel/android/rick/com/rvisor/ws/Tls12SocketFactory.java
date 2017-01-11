@@ -36,10 +36,9 @@ public class Tls12SocketFactory extends SSLSocketFactory {
     }
 
     public Tls12SocketFactory(SSLSocketFactory delegate) {
-        Log.e(LOG_TAG,"Debo !!!!!!!!!!!!!!!!!!!!!! ");
         if (delegate == null) {
             try {
-                Log.e(LOG_TAG,"Poede DEFAULR  TTTTTTT  ");
+                Log.e(LOG_TAG,"Pdhdhdh ");
                 SSLContext context = SSLContext.getInstance("TLSv1");
                 context.init(null, null, null);
                 delegate = context.getSocketFactory();
