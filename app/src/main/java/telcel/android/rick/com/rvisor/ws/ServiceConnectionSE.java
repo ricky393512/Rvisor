@@ -49,7 +49,7 @@ public class ServiceConnectionSE {
 
     public ServiceConnectionSE(Proxy proxy, String url) throws IOException {
         try {
-            SSLContext sc = SSLContext.getInstance("TLS");
+            SSLContext sc = SSLContext.getInstance("TLSv1.2");
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {

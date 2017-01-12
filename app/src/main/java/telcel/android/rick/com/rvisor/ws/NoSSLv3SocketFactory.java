@@ -31,6 +31,8 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory{
     }
 
     public NoSSLv3SocketFactory(SSLSocketFactory delegate) {
+        System.out.println("Invocando SSL stuck !!!! " );
+
         this.delegate = delegate;
     }
 
@@ -92,10 +94,14 @@ public class NoSSLv3SocketFactory extends SSLSocketFactory{
                     enabledProtocols.remove("SSLv3");
                     System.out.println("Removed SSLv3 from enabled protocols");
                 } else {
-                    System.out.println("SSL stuck with protocol available for " + String.valueOf(enabledProtocols));
+                    System.out.println("SSL stuck !!!! with protocol available for " + String.valueOf(enabledProtocols));
                 }
                 protocols = enabledProtocols.toArray(new String[enabledProtocols.size()]);
             }
+
+
+            protocols = new String[]{"TLSv1"};
+            System.out.println("SSL stuck !!!! with protocol available for TLSv1 " );
 
             super.setEnabledProtocols(protocols);
         }

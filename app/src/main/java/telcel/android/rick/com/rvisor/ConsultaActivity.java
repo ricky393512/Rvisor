@@ -1,5 +1,6 @@
 package telcel.android.rick.com.rvisor;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
@@ -30,7 +31,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.security.ProviderInstaller;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
@@ -561,6 +566,8 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
     private void cargaCatalogoProductos(){
+        updateAndroidSecurityProvider(this);
+
         new AsyncTask<String, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(String... params) {
@@ -602,9 +609,23 @@ public class ConsultaActivity extends AppCompatActivity {
 
     }
 
+    private void updateAndroidSecurityProvider(Activity callingActivity) {
+        try {
+            Log.e("SecurityException", "Checando !!!!!!!!!!!!!e.");
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            // Thrown when Google Play Services is not installed, up-to-date, or enabled
+            // Show dialog to allow users to install, update, or otherwise enable Google Play services.
+            GooglePlayServicesUtil.getErrorDialog(e.getConnectionStatusCode(), callingActivity, 0);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Log.e("SecurityException", "Google Play Services not available.");
+        }
+    }
+
+
     private void ScanEAN() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-        intent.putExtra("SCAN_MODE", "PDF_417");
+        //intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
 
         this.startActivityForResult(intent, 1);
     }
@@ -612,7 +633,7 @@ public class ConsultaActivity extends AppCompatActivity {
 
     private void ScanIccid() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-        intent.putExtra("SCAN_MODE", "PDF_417");
+        //intent.putExtra("SCAN_MODE","PRODUCT_MODE");
 
         this.startActivityForResult(intent, 2);
     }
@@ -752,8 +773,8 @@ public class ConsultaActivity extends AppCompatActivity {
             c = (HttpURLConnection) siteURL
                     .openConnection();
             c.setRequestMethod("HEAD");
-            c.setConnectTimeout(1000); //set timeout to 5 seconds
-            c.setReadTimeout(1000);
+            c.setConnectTimeout(20000); //set timeout to 5 seconds
+            c.setReadTimeout(20000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
             System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);

@@ -49,8 +49,8 @@ public class Conexion  extends AppCompatActivity {
             c = (HttpURLConnection) siteURL
                     .openConnection();
             c.setRequestMethod("HEAD");
-            c.setConnectTimeout(1000); //set timeout to 5 seconds
-            c.setReadTimeout(1000);
+            c.setConnectTimeout(5000); //set timeout to 5 seconds
+            c.setReadTimeout(5000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
             System.out.println("Codigo de respuesta!!!!!!!!!!"+httpStatusCode);

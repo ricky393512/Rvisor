@@ -6,7 +6,10 @@ import org.ksoap2.transport.HttpsTransportSE;
 import org.ksoap2.transport.ServiceConnection;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 /**
@@ -32,12 +35,30 @@ public class HttpsTls12TransportSE extends HttpsTransportSE
     @Override
     public ServiceConnection getServiceConnection() throws IOException
     {
+        SSLContext sslcontext = null;
+        try {
+            sslcontext = SSLContext.getInstance("TLSv1");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            sslcontext.init(null,
+                    null,
+                    null);
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+       SSLSocketFactory NoSSLv3Factory = new NoSSLv3SocketFactory(sslcontext.getSocketFactory());
+
+
         ServiceConnection serviceConnection =
                 new HttpsServiceConnectionSEIgnoringConnectionClose(host, port, file, timeout);
         serviceConnection.setRequestProperty("Connection", "keep-alive");
 
-        SSLSocketFactory factory = new Tls12SocketFactory();
-        ((HttpsServiceConnectionSE)serviceConnection).setSSLSocketFactory(factory);
+      //   SSLSocketFactory factory = new Tls12SocketFactory();
+        //NoSSLv3Factory.
+        ((HttpsServiceConnectionSE)serviceConnection).setSSLSocketFactory(NoSSLv3Factory);
 
         return serviceConnection;
     }

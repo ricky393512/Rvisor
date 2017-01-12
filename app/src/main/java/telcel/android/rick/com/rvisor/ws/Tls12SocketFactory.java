@@ -37,10 +37,10 @@ public class Tls12SocketFactory extends SSLSocketFactory {
 
     public Tls12SocketFactory(SSLSocketFactory delegate) {
         Log.e(LOG_TAG,"NEtroooooo ");
-        if (delegate == null) {
+      //  if (delegate == null) {
             try {
-                Log.e(LOG_TAG,"es nulo ");
-                SSLContext context = SSLContext.getInstance("TLS");
+                Log.e(LOG_TAG,"es nulo TLSv1");
+                SSLContext context = SSLContext.getInstance("TLSv1");
 
                 context.init(null, null, null);
                 delegate = context.getSocketFactory();
@@ -48,18 +48,18 @@ public class Tls12SocketFactory extends SSLSocketFactory {
                 delegate = HttpsURLConnection.getDefaultSSLSocketFactory();
                 Log.e(LOG_TAG,"Probelmas ss "+ex.getMessage());
             }
-        }
+       // }
 
         Log.e(LOG_TAG,"Continuoooo ");
 
         disabledProtocols = new ArrayList<>(6);
 
-        disabledProtocols.add("TLSv1");
+       // disabledProtocols.add("TLSv1");
 
         disabledProtocols.add("SSL");
         disabledProtocols.add("SSLv1");
         disabledProtocols.add("SSLv3");
-        disabledProtocols.add("TLSv1.2");
+      //  disabledProtocols.add("TLSv1.2");
         disabledProtocols.add("TLSv1.1");
 
         this.delegate = delegate;
@@ -111,7 +111,7 @@ public class Tls12SocketFactory extends SSLSocketFactory {
 
         private Tls12OnlySocket(SSLSocket delegate) {
             super(delegate);
-            delegate.setEnabledProtocols(new String[]{"TLSv1.2"});
+            delegate.setEnabledProtocols(new String[]{"TLSv1"});
         }
 
         @Override

@@ -150,6 +150,8 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
             ArrayAdapter adapter = new ArrayAdapter(context, R.layout.row, listaProductos);
             adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
             mySpinner.setAdapter(adapter);
+            Toast.makeText(context, "Catalogos Actualizados",
+                    Toast.LENGTH_LONG).show();
         }
 
 
@@ -169,8 +171,8 @@ public class CoopelWS  extends AsyncTask<Void, Void, Boolean> {
             c = (HttpURLConnection) siteURL
                     .openConnection();
             c.setRequestMethod("HEAD");
-            c.setConnectTimeout(1000); //set timeout to 5 seconds
-            c.setReadTimeout(1000);
+            c.setConnectTimeout(20000); //set timeout to 5 seconds
+            c.setReadTimeout(20000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
             Log.i("RVISOR MOBILE", "Arriba !!!!!!!!!!"+httpStatusCode);

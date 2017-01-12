@@ -1,5 +1,6 @@
 package telcel.android.rick.com.rvisor;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,25 +19,24 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.security.ProviderInstaller;
+
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 
 import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
-import telcel.android.rick.com.rvisor.ws.HttpsTls12TransportSE;
-import telcel.android.rick.com.rvisor.ws.NoSSLv3SocketFactory;
 
 /**
  * A login screen that offers login via claveDistribuidor/claveVendedor
@@ -57,11 +57,25 @@ public class LoginActivity extends AppCompatActivity{
     String vendedor;
     private Conexion conexion;
 
+    private void updateAndroidSecurityProvider(Activity callingActivity) {
+        try {
+            Log.e("SecurityException", "Checando !!!!!!!!!!!!!e.");
+            ProviderInstaller.installIfNeeded(this);
+        } catch (GooglePlayServicesRepairableException e) {
+            // Thrown when Google Play Services is not installed, up-to-date, or enabled
+            // Show dialog to allow users to install, update, or otherwise enable Google Play services.
+            GooglePlayServicesUtil.getErrorDialog(e.getConnectionStatusCode(), callingActivity, 0);
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Log.e("SecurityException", "Google Play Services not available.");
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        updateAndroidSecurityProvider(this);
         // Session class instance
         session = new SessionManager(getApplicationContext());
         conexion = new Conexion();
@@ -98,6 +112,7 @@ public class LoginActivity extends AppCompatActivity{
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+
        if(!estaConectado())
            return;
 
@@ -172,10 +187,11 @@ public class LoginActivity extends AppCompatActivity{
 
 
 
-    /**
-     * Represents an asynchronous login/registration task used to authenticate
-     * the user.
-     */
+
+        /**
+         * Represents an asynchronous login/registration task used to authenticate
+         * the user.
+         */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
         final String NAMESPACE = "http://ws.telcel.com/";
         final String URL="https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
@@ -206,7 +222,7 @@ public class LoginActivity extends AppCompatActivity{
 
         @Override
         protected Boolean doInBackground(Void... params) {
-
+            updateAndroidSecurityProvider(LoginActivity.this);
 
             if (!isAvailableWSDL(URL)) {
 
@@ -229,7 +245,7 @@ public class LoginActivity extends AppCompatActivity{
             // add the outgoing object as the request
             envelope.setOutputSoapObject(requestObject);
             envelope.dotNet = false;
-           // HttpTransportSE ht = new HttpTransportSE(URL);
+            HttpTransportSE ht = new HttpTransportSE(URL);
 
             java.net.URL url= null;
             try {
@@ -249,29 +265,13 @@ public class LoginActivity extends AppCompatActivity{
             Log.d("RVISORMOVILE", "port -> " + port);
             Log.d("RVISORMOVILE", "file -> " + file);
 
+            Log.d("RVISORMOVILE", "Voy normal" + host);
 
-
-//            HttpsTransportSE hts = new KeepAliveHttpsTransportSE()
-            SSLContext sslcontext = null;
-            try {
-                sslcontext = SSLContext.getInstance("TLSv1");
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                sslcontext.init(null,
-                        null,
-                        null);
-            } catch (KeyManagementException e) {
-                e.printStackTrace();
-            }
-            SSLSocketFactory NoSSLv3Factory = new NoSSLv3SocketFactory(sslcontext.getSocketFactory());
+      //     HttpsTransportSE ht = new KeepAliveHttpsTransportSE(host, port, file, 10000);
 
 
 
-
-            HttpsTls12TransportSE ht =new HttpsTls12TransportSE(host, port, file, 10000);
+            //HttpsTls12TransportSE ht =new HttpsTls12TransportSE(host, port, file, 10000);
 
         //    ht.
             ht.debug = true;
