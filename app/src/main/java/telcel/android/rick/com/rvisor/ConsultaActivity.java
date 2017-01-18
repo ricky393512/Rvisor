@@ -65,6 +65,7 @@ public class ConsultaActivity extends AppCompatActivity {
     EditText campo_imei;
     EditText campo_iccid;
     EditText campo_codigo_ciudad;
+
     TextView txtClaveDistribuidor, txtClaveVendedor, txtResultado;
     CoopelWS coopelWS = null;
     // Session Manager Class
@@ -697,6 +698,43 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    private boolean isNumber(String word)
+    {
+        boolean isNumber = false;
+        try
+        {
+            Integer.parseInt(word);
+            isNumber = true;
+        } catch (NumberFormatException e)
+        {
+            isNumber = false;
+        }
+        return isNumber;
+    }
+
+
+    public void agregaCodigoCiudad(ArrayList<String> palabras)
+    {
+        boolean understood = false;
+        // look for a number within "heard"
+        for (String word : palabras)
+        {
+            if (isNumber(word))
+            {
+                Log.e("VALIDANDOLETRAS"," palabra "+word);
+                String responseFormat = campo_codigo_ciudad.getText().toString();
+
+                String response =responseFormat+word;
+                Log.e("VALIDANDOLETRAS"," envio "+response);
+                campo_codigo_ciudad.setText(response);
+
+            }else{
+                Log.e("VALIDANDOLETRAS"," No numeros "+word);
+            }
+        }
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -709,6 +747,10 @@ public class ConsultaActivity extends AppCompatActivity {
                 ArrayList<String> speech = data
                         .getStringArrayListExtra(RecognizerIntent.
                                 EXTRA_RESULTS);
+               //Voy al metodo
+                campo_codigo_ciudad.setText("");
+                agregaCodigoCiudad(speech);
+
                 String strSpeech2Text = speech.get(0);
 
                 System.out.println("El valo errrr "+strSpeech2Text);
