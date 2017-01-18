@@ -826,8 +826,8 @@ public class ConsultaActivity extends AppCompatActivity {
             c = (HttpURLConnection) siteURL
                     .openConnection();
             c.setRequestMethod("HEAD");
-            c.setConnectTimeout(20000); //set timeout to 5 seconds
-            c.setReadTimeout(20000);
+            c.setConnectTimeout(70000); //set timeout to 5 seconds
+            c.setReadTimeout(70000);
             c.connect();
             httpStatusCode = c.getResponseCode(); //200, 404 etc.
             System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);

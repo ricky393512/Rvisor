@@ -54,8 +54,7 @@ tools:context="telcel.android.rick.com.rvisor.ConsultaActivity">
 
         <TextView
             android:id="@+id/textView11"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="99dp"
             android:layout_height="wrap_content"
             android:text="@string/hint_distribuidor"
             android:layout_gravity="left"
@@ -89,7 +88,6 @@ tools:context="telcel.android.rick.com.rvisor.ConsultaActivity">
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:text=""
-            android:layout_gravity="right"
             android:textColor="@color/colorAccent"
             />
 
