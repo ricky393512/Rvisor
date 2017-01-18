@@ -28,8 +28,8 @@
 
 
     <string name="accion_ingresar">Ingresar</string>
-    <string name="accion_aceptar">Activar</string>
+    <string name="accion_aceptar">Activa</string>
     <string name="accion_nueva">Nueva</string>
-    <string name="accion_consultar">Consultar</string>
+    <string name="accion_consultar">Consulta</string>
 
 </resources>

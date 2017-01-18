@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -71,6 +73,7 @@ public class ConsultaActivity extends AppCompatActivity {
     final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     Credencial credencial= new Credencial();
     private Conexion conexion;
+    private static final int RECOGNIZE_SPEECH_ACTIVITY = 3;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -482,7 +485,7 @@ public class ConsultaActivity extends AppCompatActivity {
         Button btnActivar = (Button) findViewById(R.id.boton_aceptar);
         Button btnNueva = (Button) findViewById(R.id.btnNueva);
         Button btnProducto = (Button) findViewById(R.id.btnProducto);
-
+        Button btnCiudad = (Button) findViewById(R.id.btnCiudad);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         campo_imei = (EditText) findViewById(R.id.campo_imei);
@@ -521,6 +524,11 @@ public class ConsultaActivity extends AppCompatActivity {
         });
 
 
+
+
+
+
+
         btnActivar.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -557,6 +565,16 @@ public class ConsultaActivity extends AppCompatActivity {
             }
         });
 
+        btnCiudad.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                onClickImgBtnHablar();
+            }
+        });
+
+
+
 
         cargaCatalogoProductos();
 
@@ -564,6 +582,31 @@ public class ConsultaActivity extends AppCompatActivity {
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
+
+
+
+    public void onClickImgBtnHablar( ) {
+
+        Intent intentActionRecognizeSpeech = new Intent(
+                RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+        // Configura el Lenguaje (Español-México)
+        intentActionRecognizeSpeech.putExtra(
+                RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
+        intentActionRecognizeSpeech.putExtra(
+                RecognizerIntent.EXTRA_PROMPT,"Diga, El código de ciudad ...");
+        try {
+            startActivityForResult(intentActionRecognizeSpeech,
+                    RECOGNIZE_SPEECH_ACTIVITY);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    "Tú dispositivo no soporta el reconocimiento por voz",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
 
     private void cargaCatalogoProductos(){
         updateAndroidSecurityProvider(this);
@@ -662,6 +705,16 @@ public class ConsultaActivity extends AppCompatActivity {
                 campo_imei.setText(data.getStringExtra("SCAN_RESULT"));
             else if (requestCode == 2)
                 campo_iccid.setText(data.getStringExtra("SCAN_RESULT"));
+            else if (requestCode == 3){
+                ArrayList<String> speech = data
+                        .getStringArrayListExtra(RecognizerIntent.
+                                EXTRA_RESULTS);
+                String strSpeech2Text = speech.get(0);
+
+                System.out.println("El valo errrr "+strSpeech2Text);
+            }
+
+
         }
     }
 
