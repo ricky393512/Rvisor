@@ -1,4 +1,4 @@
-package telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session;
+package telcel.android.rick.com.rvisor.session;
 
 /**
  * Created by PIN7025 on 25/07/2016.

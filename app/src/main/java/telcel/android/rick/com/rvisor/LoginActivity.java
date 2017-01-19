@@ -30,7 +30,8 @@ import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
 import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.net.Constantes;
 import telcel.android.rick.com.rvisor.pojo.RespuestaLogueo;
-import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
+import telcel.android.rick.com.rvisor.session.SessionManager;
+
 
 /**
  * A login screen that offers login via claveDistribuidor/claveVendedor

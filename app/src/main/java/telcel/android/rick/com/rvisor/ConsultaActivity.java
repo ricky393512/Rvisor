@@ -47,7 +47,7 @@ import telcel.android.rick.com.rvisor.pojo.Activacion;
 import telcel.android.rick.com.rvisor.pojo.Credencial;
 import telcel.android.rick.com.rvisor.pojo.RespuestaActivacion;
 import telcel.android.rick.com.rvisor.pojo.TipoProducto;
-import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
+import telcel.android.rick.com.rvisor.session.SessionManager;
 import telcel.android.rick.com.rvisor.ws.CoopelWS;
 
 public class ConsultaActivity extends AppCompatActivity {
