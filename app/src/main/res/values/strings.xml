@@ -19,7 +19,7 @@
     <string name="error_distribuidor_incorrecto">Clave de Distribuidor incorrecta</string>
     <string name="error_vendedor_incorrecto">Clave de Vendedor incorrecta</string>
 
-    <string name="error_ws_nodisponible">WebService NO DISPONIBLE</string>
+    <string name="error_ws_nodisponible">PROBLEMA con WebService</string>
     <string name="error_conexion_nodisponible"> Tu Dispositivo no tiene Conexion a Internet.</string>
     <string name="error_titulo_conexion_nodisponible"> Conexion a Internet</string>
 

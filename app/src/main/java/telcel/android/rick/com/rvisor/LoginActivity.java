@@ -32,9 +32,12 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URL;
 
+import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
 import telcel.android.rick.com.rvisor.net.Conexion;
+import telcel.android.rick.com.rvisor.pojo.RespuestaLogueo;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 
 /**
@@ -184,7 +187,7 @@ public class LoginActivity extends AppCompatActivity{
         final int timeOut=70000;
         final String distribuidor;
         final String vendedor;
-
+        RespuestaLogueo respuestaLogueo=null;
         private ProgressDialog progreso;
 
 
@@ -218,75 +221,27 @@ public class LoginActivity extends AppCompatActivity{
                return false;
            }
            // Create the outgoing message
+            respuestaLogueo = new RespuestaLogueo();
             SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
             requestObject.addProperty("cod_distribuidor",distribuidor);
             requestObject.addProperty("cod_vendedor",vendedor);
-            // Create soap envelop .use version 1.1 of soap
-            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-            // add the outgoing object as the request
-            envelope.setOutputSoapObject(requestObject);
-            envelope.dotNet = false;
-            HttpTransportSE ht = null;
-            ht=  new HttpTransportSE(URL,timeOut);
+            SoapSerializationEnvelope envelope = conexion.getSoapSerializationEnvelope(requestObject);
+            HttpTransportSE ht = conexion.getHttpTransportSE(URL,timeOut);
+            try{
 
-            java.net.URL url= null;
-            try {
-                url = new URL(URL);
-            } catch (MalformedURLException e) {
+                Object retObj = conexion.llamadaAlWS(envelope,ht,SOAP_ACTION);
+                respuestaLogueo = conexion.obtenerCredencialesSoap((SoapObject)retObj);
+            }catch (WebServiceConexionException e){
                 e.printStackTrace();
+                respuestaLogueo.setCodigo(-1);
+                respuestaLogueo.setMensaje(e.getMessage());
+            }catch(Exception e){
+                e.printStackTrace();
+                respuestaLogueo.setCodigo(-1);
+                respuestaLogueo.setMensaje(e.getMessage());
             }
 
-            ht.debug = true;
-            // call and Parse Result.
-
-            try {
-                        ht.call(SOAP_ACTION, envelope);
-                        Log.i("RVISOR MOBILE", "La cadena de envio del WS!! es la siguiente: "+ht.requestDump);
-                        String theXmlString = ht.responseDump;
-                        Log.i("RVISOR MOBILE", "La respuesta del WS es la siguiente: "+theXmlString);
-                        Object retObj = envelope.bodyIn;
-
-                        if(retObj==null){
-
-                            Log.i("RVISOR MOBILE","Aqi caigo");
-                            mensajeFinal="WebService: Por TIMEOUT";
-                            codigoeFinal="-1";
-                        } else  if (retObj instanceof SoapFault){
-                            SoapFault fault = (SoapFault)retObj;
-                            //Exception ex = new Exception(fault.faultstring);
-                            mensajeFinal= fault.faultstring;
-                            codigoeFinal="-1";
-                        }else{
-                            SoapObject soap=(SoapObject)retObj;
-                            if (soap.getPropertyCount() > 0){
-                                SoapObject soapResult = (SoapObject) soap.getProperty(0);
-                                Log.i("RVISOR MOBILE","TOTAL PROPIEDADES S: "+soapResult.getPropertyCount());
-                                if (soapResult != null) {
-                                    SoapObject soapResult1 = (SoapObject)soap.getProperty(0);
-                                    Log.i("RVISOR MOBILE","Propiedad ---"+soapResult1.getPropertyCount());
-                                    SoapPrimitive codigo=    (SoapPrimitive) soapResult1.getProperty(0);
-                                    SoapPrimitive mensaje=    (SoapPrimitive) soapResult1.getProperty(1);
-                                    mensajeFinal=mensaje.toString();
-                                    codigoeFinal=codigo.toString();
-                                    Log.i("RVISOR MOBILE","codigo respuesta WS "+codigo.toString());
-                                    Log.i("RVISOR MOBILE","mensaje respuesta WS "+mensaje.toString());
-                                }
-
-                            }
-                        }
-
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-                return false;
-            }
-
-            if(codigoeFinal.toString().equals("100"))
+            if(respuestaLogueo.getCodigo()==100)
                 return true;
             else
                 return false;
@@ -307,15 +262,15 @@ public class LoginActivity extends AppCompatActivity{
                 finish();
 
             } else {
-                if(mensajeFinal.toString().startsWith("Clave de distribuidor")){
+                if(respuestaLogueo.getMensaje().startsWith("Clave de distribuidor")){
                     mClaveDistribuidorView.setError(getString(R.string.error_distribuidor_incorrecto));
                     mClaveDistribuidorView.requestFocus();
-                }else if (mensajeFinal.toString().startsWith("Clave de vendedor")) {
+                }else if (respuestaLogueo.getMensaje().startsWith("Clave de vendedor")) {
                     mClaveVendedorView.setError(getString(R.string.error_vendedor_incorrecto));
                     mClaveVendedorView.requestFocus();
-                }else if (mensajeFinal.toString().startsWith("WebService")){
+                }else {
                     mostrarAlerta(LoginActivity.this, getString(R.string.error_ws_nodisponible),
-                            mensajeFinal, false);
+                            respuestaLogueo.getMensaje(), false);
                 }
 
             }

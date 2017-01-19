@@ -65,8 +65,9 @@ public class ConsultaActivity extends AppCompatActivity {
     EditText campo_imei;
     EditText campo_iccid;
     EditText campo_codigo_ciudad;
-
-    TextView txtClaveDistribuidor, txtClaveVendedor, txtResultado;
+    TextView txtClaveDistribuidor;
+    TextView txtClaveVendedor;
+    TextView txtResultado;
     CoopelWS coopelWS = null;
     // Session Manager Class
     SessionManager session;
@@ -74,7 +75,6 @@ public class ConsultaActivity extends AppCompatActivity {
     final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     Credencial credencial= new Credencial();
     private Conexion conexion;
-    private static final int RECOGNIZE_SPEECH_ACTIVITY = 3;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -310,8 +310,12 @@ public class ConsultaActivity extends AppCompatActivity {
                 @Override
                 protected Boolean doInBackground(Void... params) {
                     listaProductos = new ArrayList<TipoProducto>();
-                    if (!isAvailableWSDL(URL)) {
-                        System.out.println("NO esta arriba");
+                    try {
+                        if (!conexion.isAvailableWSDL(URL)) {
+                            Log.e("RVISOR MOBILE", "El WS " + URL + " no esta en linea ");
+                            return false;
+                        }
+                    }catch(Exception e){
                         return false;
                     }
                     // Create the outgoing message
@@ -502,12 +506,8 @@ public class ConsultaActivity extends AppCompatActivity {
 
         txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
         txtClaveDistribuidor = (TextView) findViewById(R.id.txtClaveDistribuidor);
-
-
         txtClaveVendedor.setText(credencial.getClaveVendedor());
         txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
-
-
         btnProducto.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -525,11 +525,6 @@ public class ConsultaActivity extends AppCompatActivity {
         });
 
 
-
-
-
-
-
         btnActivar.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -537,15 +532,15 @@ public class ConsultaActivity extends AppCompatActivity {
                 // And to get the actual User object that was selected, you can do this.
                 //TipoProducto tipoProducto = (TipoProducto) ((Spinner) findViewById(R.id.my_spinner)).getSelectedItem();
                // realizaActivacion();
-                if(estaConectado()) {
+                if(conexion.estaConectado()){
                     confirmaAcciones();
-                }else{
-                    Log.e("ERROR"," no esta conextado");
+               }else{
+
+                    mostrarAlerta(ConsultaActivity.this, getString(R.string.error_titulo_conexion_nodisponible),
+                            getString(R.string.error_conexion_nodisponible), false);
                 }
+
                 //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
-
-
-
             }
         });
 
@@ -566,13 +561,6 @@ public class ConsultaActivity extends AppCompatActivity {
             }
         });
 
-        btnCiudad.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                onClickImgBtnHablar();
-            }
-        });
 
 
 
@@ -586,26 +574,6 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
 
-    public void onClickImgBtnHablar( ) {
-
-        Intent intentActionRecognizeSpeech = new Intent(
-                RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
-        // Configura el Lenguaje (Español-México)
-        intentActionRecognizeSpeech.putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL, "es-MX");
-        intentActionRecognizeSpeech.putExtra(
-                RecognizerIntent.EXTRA_PROMPT,"Diga, El código de ciudad ...");
-        try {
-            startActivityForResult(intentActionRecognizeSpeech,
-                    RECOGNIZE_SPEECH_ACTIVITY);
-        } catch (ActivityNotFoundException a) {
-            Toast.makeText(getApplicationContext(),
-                    "Tú dispositivo no soporta el reconocimiento por voz",
-                    Toast.LENGTH_SHORT).show();
-        }
-
-    }
 
 
 
@@ -616,7 +584,7 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             protected Boolean doInBackground(String... params) {
                 //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
-                boolean valor = isAvailableWSDL(URL);
+                boolean valor = conexion.isAvailableWSDL(URL);
                 return valor ;
             }
 
@@ -713,29 +681,6 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
-    public void agregaCodigoCiudad(ArrayList<String> palabras)
-    {
-        boolean understood = false;
-        // look for a number within "heard"
-        for (String word : palabras)
-        {
-            if (isNumber(word))
-            {
-                Log.e("VALIDANDOLETRAS"," palabra "+word);
-                String responseFormat = campo_codigo_ciudad.getText().toString();
-
-                String response =responseFormat+word;
-                Log.e("VALIDANDOLETRAS"," envio "+response);
-                campo_codigo_ciudad.setText(response);
-
-            }else{
-
-                Log.e("VALIDANDOLETRAS"," No palabreas "+word);
-            }
-        }
-
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -744,20 +689,6 @@ public class ConsultaActivity extends AppCompatActivity {
                 campo_imei.setText(data.getStringExtra("SCAN_RESULT"));
             else if (requestCode == 2)
                 campo_iccid.setText(data.getStringExtra("SCAN_RESULT"));
-            else if (requestCode == 3){
-                ArrayList<String> speech = data
-                        .getStringArrayListExtra(RecognizerIntent.
-                                EXTRA_RESULTS);
-               //Voy al metodo
-                campo_codigo_ciudad.setText("");
-                agregaCodigoCiudad(speech);
-
-                String strSpeech2Text = speech.get(0);
-
-                System.out.println("El valo errrr "+strSpeech2Text);
-            }
-
-
         }
     }
 
@@ -861,43 +792,10 @@ public class ConsultaActivity extends AppCompatActivity {
         // Construir la notificación y emitirla
         notifyMgr.notify(id, builder.build());
     }
-    public boolean isAvailableWSDL(String url) {
-        HttpURLConnection c = null;
-        Integer httpStatusCode=0;
-        try {
-            URL siteURL = new URL(url);
-            c = (HttpURLConnection) siteURL
-                    .openConnection();
-            c.setRequestMethod("HEAD");
-            c.setConnectTimeout(70000); //set timeout to 5 seconds
-            c.setReadTimeout(70000);
-            c.connect();
-            httpStatusCode = c.getResponseCode(); //200, 404 etc.
-            System.out.println("Arriba !!!!!!!!!!"+httpStatusCode);
-            if(httpStatusCode==200)
-                return true;
-            else {
-                mensajeAct="WebService NO DISPONIBLE: "+codigoAct;
-                codigoAct=httpStatusCode.toString();
-
-                return false;
-
-            }
 
 
 
-        } catch (Exception e) {
-            mensajeAct="WebService NO DISPONIBLE: "+codigoAct;
-            codigoAct=httpStatusCode.toString();
-            return false;
-        } finally {
-            if (c != null) {
-                c.disconnect();
-                c = null;
-            }
-        }
 
-    }
 
     @Override
     public void onStart() {
@@ -941,47 +839,8 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
 
-    protected Boolean estaConectado(){
-        if(conectadoWifi()){
-            return true;
-        }else{
-            if(conectadoRedMovil()){
-                return true;
-            }else{
-                showAlertDialog(ConsultaActivity.this, getString(R.string.error_titulo_conexion_nodisponible),
-                        getString(R.string.error_conexion_nodisponible), false);
-                return false;
-            }
-        }
-    }
 
-    protected Boolean conectadoWifi(){
-        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-            if (info != null) {
-                if (info.isConnected()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    protected Boolean conectadoRedMovil(){
-        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivity != null) {
-            NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-            if (info != null) {
-                if (info.isConnected()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public void showAlertDialog(Context context, String title, String message, Boolean status) {
+    public void mostrarAlerta(Context context, String title, String message, Boolean status) {
         AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
         alert.setTitle(title);
         alert.setMessage(message+ "\n"

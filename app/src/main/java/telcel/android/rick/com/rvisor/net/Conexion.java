@@ -5,11 +5,20 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.SoapFault;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
+import telcel.android.rick.com.rvisor.pojo.Credencial;
+import telcel.android.rick.com.rvisor.pojo.RespuestaLogueo;
 
 /**
  * Created by PIN7025 on 03/01/2017.
@@ -110,5 +119,87 @@ public class Conexion  {
         }
 
     }
+
+    public SoapSerializationEnvelope getSoapSerializationEnvelope(SoapObject request){
+        SoapSerializationEnvelope envelope= new SoapSerializationEnvelope(SoapEnvelope.VER11);
+        envelope.setOutputSoapObject(request);
+        envelope.dotNet = false;
+        envelope.implicitTypes=true;
+        envelope.setAddAdornments(false);
+        return envelope;
+    }
+
+    public HttpTransportSE getHttpTransportSE(String url,int timeOut){
+        HttpTransportSE ht = new HttpTransportSE(url,timeOut);
+        ht.debug=true;
+        ht.setXmlVersionTag("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        return ht;
+    }
+
+    public  Object llamadaAlWS(SoapSerializationEnvelope envelope, HttpTransportSE ht, String SOAP_ACTION)
+    {
+
+        try
+        {
+            ht.call(SOAP_ACTION, envelope);
+            Log.i("RVISOR MOBILE", "La cadena de envio del WS!! es la siguiente: "+ht.requestDump);
+            String theXmlString = ht.responseDump;
+            Log.i("RVISOR MOBILE", "La respuesta del WS es la siguiente: "+theXmlString);
+            Object response = envelope.bodyIn;
+
+            if(response==null){
+
+                Log.i("RVISOR MOBILE","Aqi caigo");
+                throw new WebServiceConexionException("La respuesta del WS es nula");
+            } else  if (response instanceof SoapFault){
+                SoapFault fault = (SoapFault)response;
+                throw new WebServiceConexionException(fault.faultstring);
+
+
+            }
+
+
+            return response;
+   /*
+    } catch (IOException | XmlPullParserException e)
+
+    {
+        e.printStackTrace();
+        throw new WebServiceConexionException("El problema se debe a: "+e.getMessage());
+    */
+    }  catch(Exception e)
+        {
+            e.printStackTrace();
+            throw new WebServiceConexionException("El problema se debe a: "+e.getMessage());
+        }
+
+
+    }
+
+    public RespuestaLogueo obtenerCredencialesSoap(SoapObject soap) {
+        RespuestaLogueo respuestaLogueo = new RespuestaLogueo();
+
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+            SoapObject pii = (SoapObject) soap.getProperty(i);
+            respuestaLogueo.setCodigo(Integer.parseInt(pii.getProperty(0).toString()));
+            respuestaLogueo.setMensaje(pii.getProperty(1).toString());
+
+        }
+        return respuestaLogueo;
+    }
+ /*
+    public  Category[] RetrieveFromSoap(SoapObject soap)
+    {
+        Category[] categories = new Category[soap.getPropertyCount()];
+        for (int i = 0; i < categories.length; i++) {
+            SoapObject pii = (SoapObject)soap.getProperty(i);
+            Category category = new Category();
+            category.CategoryId = Integer.parseInt(pii.getProperty(0).toString());
+            category.Name = pii.getProperty(1).toString();
+            category.Description = pii.getProperty(2).toString();
+            categories[i] = category;
+        }
+        return categor*/
+
 
 }
