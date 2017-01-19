@@ -3,19 +3,44 @@ package telcel.android.rick.com.rvisor.net;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
+
 /**
  * Created by PIN7025 on 03/01/2017.
  */
-public class Conexion  extends AppCompatActivity {
+public class Conexion  {
+
+    // Context
+    Context context;
+    // Constructor
+
+    public Conexion(Context context){
+        this.context = context;
+
+    }
+
+    public Boolean estaConectado(){
+        if(conectadoWifi()){
+            return true;
+        }else{
+            if(conectadoRedMovil()){
+                return true;
+            }else{
+
+                return false;
+            }
+        }
+    }
+
 
     public Boolean conectadoWifi(){
-        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
             if (info != null) {
@@ -28,7 +53,7 @@ public class Conexion  extends AppCompatActivity {
     }
 
     public Boolean conectadoRedMovil(){
-        ConnectivityManager connectivity = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(context.CONNECTIVITY_SERVICE);
         if (connectivity != null) {
             NetworkInfo info = connectivity.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
             if (info != null) {
@@ -66,6 +91,24 @@ public class Conexion  extends AppCompatActivity {
 
     }
 
+    public boolean isAvailableWSDL(String url) {
+        Integer httpStatusCode=0;
+        try {
+            httpStatusCode= isAvailableWSDLCode(url);
+            Log.d("RVISOR MOBILE", "El WS me responde un codigo "+httpStatusCode);
+            if(httpStatusCode==200)
+                return true;
+            else
+                return false;
 
+        } catch (Exception e) {
+            Log.e("RVISOR MOBILE", "No levanta el WS por "+e.getMessage());
+            throw new WebServiceConexionException("El Web Service No Responde me manda el siguiente codigo: "+httpStatusCode.toString()+" con mensaje "+e.getMessage());
+         //   mensajeFinal="WebService: "+e.getMessage();
+           // codigoeFinal=httpStatusCode.toString();
+          //  return false;
+        }
+
+    }
 
 }

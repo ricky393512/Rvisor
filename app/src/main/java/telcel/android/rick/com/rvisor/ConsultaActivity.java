@@ -479,7 +479,7 @@ public class ConsultaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta);
         session = new SessionManager(getApplicationContext());
-        conexion = new Conexion();
+        conexion = new Conexion(getApplicationContext());
         session.firstRun();
         Button btnIccid = (Button) findViewById(R.id.btnIccid);
         Button btnImei = (Button) findViewById(R.id.btnImei);
@@ -729,7 +729,8 @@ public class ConsultaActivity extends AppCompatActivity {
                 campo_codigo_ciudad.setText(response);
 
             }else{
-                Log.e("VALIDANDOLETRAS"," No numeros "+word);
+
+                Log.e("VALIDANDOLETRAS"," No palabreas "+word);
             }
         }
 
