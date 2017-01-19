@@ -22,21 +22,13 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.security.ProviderInstaller;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.SocketException;
-import java.net.URL;
 
 import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
 import telcel.android.rick.com.rvisor.net.Conexion;
+import telcel.android.rick.com.rvisor.net.Constantes;
 import telcel.android.rick.com.rvisor.pojo.RespuestaLogueo;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 
@@ -180,11 +172,6 @@ public class LoginActivity extends AppCompatActivity{
          * the user.
          */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-        final String NAMESPACE = "http://ws.telcel.com/";
-        final String URL="https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
-        final String METHOD_NAME = "realiza_autenticacion";
-        final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_autenticacion\"";
-        final int timeOut=70000;
         final String distribuidor;
         final String vendedor;
         RespuestaLogueo respuestaLogueo=null;
@@ -211,8 +198,8 @@ public class LoginActivity extends AppCompatActivity{
         protected Boolean doInBackground(Void... params) {
            updateAndroidSecurityProvider(LoginActivity.this);
            try {
-               if (!conexion.isAvailableWSDL(URL)) {
-                   Log.e("RVISOR MOBILE", "El WS " + URL + " no esta en linea ");
+               if (!conexion.isAvailableWSDL(Constantes.URL)) {
+                   Log.e("RVISOR MOBILE", "El WS " + Constantes.URL + " no esta en linea ");
                    mensajeFinal= "Web Service: No Disponible";
                    return false;
                }
@@ -222,14 +209,14 @@ public class LoginActivity extends AppCompatActivity{
            }
            // Create the outgoing message
             respuestaLogueo = new RespuestaLogueo();
-            SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
+            SoapObject requestObject = new SoapObject(Constantes.NAMESPACE, Constantes.METHOD_NAME_LOGUEO);
             requestObject.addProperty("cod_distribuidor",distribuidor);
             requestObject.addProperty("cod_vendedor",vendedor);
             SoapSerializationEnvelope envelope = conexion.getSoapSerializationEnvelope(requestObject);
-            HttpTransportSE ht = conexion.getHttpTransportSE(URL,timeOut);
+            HttpTransportSE ht = conexion.getHttpTransportSE(Constantes.URL,Constantes.TIME_OUT);
             try{
 
-                Object retObj = conexion.llamadaAlWS(envelope,ht,SOAP_ACTION);
+                Object retObj = conexion.llamadaAlWS(envelope,ht,Constantes.SOAP_ACTION_LOGUEO);
                 respuestaLogueo = conexion.obtenerCredencialesSoap((SoapObject)retObj);
             }catch (WebServiceConexionException e){
                 e.printStackTrace();

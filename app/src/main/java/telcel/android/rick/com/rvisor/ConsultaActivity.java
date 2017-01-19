@@ -1,23 +1,15 @@
 package telcel.android.rick.com.rvisor;
 
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.speech.RecognizerIntent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -39,23 +31,21 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.security.ProviderInstaller;
 
-import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
 import telcel.android.rick.com.rvisor.net.Conexion;
+import telcel.android.rick.com.rvisor.net.Constantes;
+import telcel.android.rick.com.rvisor.net.Mensaje;
 import telcel.android.rick.com.rvisor.pojo.Activacion;
 import telcel.android.rick.com.rvisor.pojo.Credencial;
+import telcel.android.rick.com.rvisor.pojo.RespuestaActivacion;
 import telcel.android.rick.com.rvisor.pojo.TipoProducto;
 import telcel.android.rick.com.rvisor.telcel.android.rick.com.rvisor.session.SessionManager;
 import telcel.android.rick.com.rvisor.ws.CoopelWS;
@@ -68,6 +58,7 @@ public class ConsultaActivity extends AppCompatActivity {
     TextView txtClaveDistribuidor;
     TextView txtClaveVendedor;
     TextView txtResultado;
+    Spinner mySpinner;
     CoopelWS coopelWS = null;
     // Session Manager Class
     SessionManager session;
@@ -75,15 +66,12 @@ public class ConsultaActivity extends AppCompatActivity {
     final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
     Credencial credencial= new Credencial();
     private Conexion conexion;
+    private  Mensaje mensaje;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
-    String codigoAct;
-    String mensajeAct;
-    String montoAct;
-    String telefonoAct;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,39 +103,24 @@ public class ConsultaActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.exit:
                 salir();
                 return (true);
-
-
             case R.id.versionRvisor:
                 acercaDe();
                 return (true);
-
-
-
         }
         return (super.onOptionsItemSelected(item));
     }
 
+
     @Override
     public void onBackPressed() {
-     /*   DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-
-*/
         moveTaskToBack(true);
-
     }
 
 
     public boolean validacionActivacion(){
-
         boolean cancel = false;
         String imei =campo_imei.getText().toString();
         String iccid =campo_iccid.getText().toString();
@@ -235,27 +208,9 @@ public class ConsultaActivity extends AppCompatActivity {
         Log.i("RVISOR MOBILE","VAlor de producto seleccionado !!!"+tipoProducto.getIdProducto());
         if(tipoProducto.getIdProducto()==-1){
             Log.e("RVISOR MOBILE","VAlor -1 de producto seleccionado !!!");
-            AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
-            alert.setTitle("Error !!!");
-            alert.setMessage("Se ha presentado el siguiente problema con el WS de Catalogos \n"+
-
-                    "Favor de recargar el catalogo para que puedas elegir un producto valido"
-
+            mensaje.getMostrarAlerta(ConsultaActivity.this,"Error !!!","Se ha presentado el siguiente problema con el WS de Catalogos \n"+
+             "Favor de recargar el catalogo para que puedas elegir un producto valido","REGRESAR A LA ACTIVACION"
             );
-            alert.setPositiveButton("REGRESAR A LA ACTIVACION", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                    //        finish();
-                    //      startActivity(getIntent());
-                    dialog.dismiss();
-
-                }
-            });
-            AlertDialog dialog = alert.create();
-
-            dialog.show();
-
             return;
         }
 
@@ -281,19 +236,16 @@ public class ConsultaActivity extends AppCompatActivity {
 
             activacion.setIdProducto(tipoProducto.getIdProducto());
             activacion.setIdModalidad(tipoProducto.getIdModalidad());
-            System.out.println();
+
             activacion.setCodigoDistribuidor(credencial.getClaveDistribuidor());
             activacion.setCodigoVendedor(credencial.getClaveVendedor());
 
             new AsyncTask<Void, Void, Boolean>() {
                 private TextView txtResultado;
                 private List<TipoProducto> listaProductos;
-                private Spinner mySpinner;
-                final String NAMESPACE = "http://ws.telcel.com/";
-                final String URL = "https://www.r7.telcel.com/wscadenas/wsActivaMobile?wsdl";
-                final String METHOD_NAME = "realiza_activacion";
-                final String SOAP_ACTION = "\"http://ws.telcel.com/realiza_activacion\"";
+
                 private ProgressDialog progreso;
+                RespuestaActivacion respuestaActivacion = new RespuestaActivacion();
 
 
                 @Override
@@ -319,7 +271,7 @@ public class ConsultaActivity extends AppCompatActivity {
                         return false;
                     }
                     // Create the outgoing message
-                    SoapObject requestObject = new SoapObject(NAMESPACE, METHOD_NAME);
+                    SoapObject requestObject = new SoapObject(Constantes.NAMESPACE, Constantes.METHOD_NAME_ACTIVA);
                     // Set Parameter
                     requestObject.addProperty("imei", activacion.getImei());
                     requestObject.addProperty("iccid", activacion.getIccid());
@@ -330,56 +282,28 @@ public class ConsultaActivity extends AppCompatActivity {
                     requestObject.addProperty("id_modalidad_activacion", tipoProducto.getIdModalidad());
 
 
-                    // Create soap envelop .use version 1.1 of soap
-                    SoapSerializationEnvelope envelope =
-                            new SoapSerializationEnvelope(SoapEnvelope.VER11);
 
-                    // add the outgoing object as the request
-                    envelope.setOutputSoapObject(requestObject);
-                    //       envelope.addMapping(NAMESPACE, "Productividad", Productividad.class);
-                    HttpTransportSE ht = new HttpTransportSE(URL);
-                    ht.debug = true;
-                    // call and Parse Result.
+                    SoapSerializationEnvelope envelope =conexion.getSoapSerializationEnvelope(requestObject);
+                    HttpTransportSE ht = conexion.getHttpTransportSE(Constantes.URL,Constantes.TIME_OUT);
 
-                    try {
-                        ht.call(SOAP_ACTION, envelope);
-                    } catch (IOException e) {
+                    try{
+
+                        Object retObj = conexion.llamadaAlWS(envelope,ht,Constantes.SOAP_ACTION_ACTIVA);
+                        respuestaActivacion = conexion.obtenerRespuestaActivaSoap((SoapObject)retObj);
+                    }catch (WebServiceConexionException e){
                         e.printStackTrace();
-                    } catch (XmlPullParserException e) {
+                        respuestaActivacion.setCodigo(-1);
+                        respuestaActivacion.setMensaje(e.getMessage());
+                    }catch(Exception e){
                         e.printStackTrace();
+                        respuestaActivacion.setCodigo(-1);
+                        respuestaActivacion.setMensaje(e.getMessage());
                     }
-                    //  SoapObject resSoap=(SoapObject)envelope.bodyIn;
 
-                    SoapObject resSoap = (SoapObject) envelope.bodyIn;
-
-
-                    if (resSoap != null) {
-
-                        SoapObject soapResult = (SoapObject) resSoap.getProperty(0);
-                        Log.i("TOTAL PROPIEDADES S: ", "" + soapResult.getPropertyCount());
-                        SoapPrimitive codigo = (SoapPrimitive) soapResult.getProperty(0);
-                        SoapPrimitive mensaje = (SoapPrimitive) soapResult.getProperty(1);
-                        codigoAct = codigo.toString();
-                        mensajeAct = mensaje.toString();
-
-                        if(codigoAct.equals("100")){
-                            SoapPrimitive monto = (SoapPrimitive) soapResult.getProperty(2);
-                            SoapPrimitive telefono = (SoapPrimitive) soapResult.getProperty(3);
-                            montoAct= monto.toString();
-                            telefonoAct= telefono.toString();
-
+                    if(respuestaActivacion.getCodigo()==100)
                             return true;
-                        }
-
-                        else
+                      else
                             return false;
-
-
-
-
-                    }
-
-                    return true;
                 }
 
 
@@ -389,78 +313,47 @@ public class ConsultaActivity extends AppCompatActivity {
                     progreso.dismiss();
 
                     if (!success) {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
-                        alert.setTitle("Error !!!");
-                        alert.setMessage("Se ha presentado el siguiente problema: \n"
-                                + mensajeAct+
-                                " con codigo "+codigoAct
-
-                        );
-                        alert.setPositiveButton("REGRESAR A LA ACTIVACION", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                        //        finish();
-                          //      startActivity(getIntent());
-                                dialog.dismiss();
-
-                            }
-                        });
-                        AlertDialog dialog = alert.create();
-
-                        dialog.show();
+                        String titulo="Error !!!";
+                        String mensaje1="Se ha presentado el siguiente problema: \n"
+                                + respuestaActivacion.getMensaje()+
+                                " con codigo "+respuestaActivacion.getCodigo();
+                        mensaje.getMostrarAlerta(ConsultaActivity.this, titulo,
+                                mensaje1,"OK");
 
 
-                        notificationError(1, R.drawable.ic_telefono, "Error de Activacion", "Se ha presentado el siguiente problema con la activacion: \n"
-                                + mensajeAct
+
+                        mensaje.getNotificationError(1, R.drawable.ic_telefono, "Error de Activacion", "Se ha presentado el siguiente problema con la activacion: \n"
+                                + respuestaActivacion.getMensaje()
                                 +"\n"
                                 );
 
 
 
                     } else {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this, R.style.myDialog);
-                        alert.setTitle("Atención");
-                        alert.setMessage("Se ha realizado la activacion correctamente \n"
-                                + mensajeAct
+
+                        mostrarAlertaExito(ConsultaActivity.this,"Atención","Se ha realizado la activacion correctamente \n"
+                                + respuestaActivacion.getMensaje()
                                 +"\n"
                                 +"Con telefono: "
 
-                                +telefonoAct
+                                +respuestaActivacion.getTelefono()
                                 + "\n"
                                 +"Y monto: "
 
-                                +montoAct
-                                + "\n"
-
-
-
-
-
-                        );
-                        alert.setPositiveButton("NUEVA ACTIVACION", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                //   startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                                finish();
-                                startActivity(getIntent());
-                            }
-                        });
-                        AlertDialog dialog = alert.create();
-                        dialog.setCancelable(false);
-                        dialog.show();
-
-                        notification4(1, R.drawable.ic_telefono, "Aviso de Activacion", "Se ha realizado la activacion correctamente \n"
-                                + mensajeAct
+                                +respuestaActivacion.getMonto()
+                                + "\n","NUEVA ACTIVACION"
+                          );
+                        mensaje.getNotificationExito(1, R.drawable.ic_telefono, "Aviso de Activacion", "Se ha realizado la activacion correctamente \n"
+                                + respuestaActivacion.getMensaje()
                                 +"\n"
                                 +"Con telefono: "
 
-                                +telefonoAct
+                                +respuestaActivacion.getTelefono()
                                 + "\n"
                                 +"Y monto: "
 
-                                +montoAct
-                                + "\n",telefonoAct,montoAct);
+                                +respuestaActivacion.getMonto()
+                                + "\n",respuestaActivacion.getTelefono(),respuestaActivacion.getMonto());
                     }
 
 
@@ -482,6 +375,7 @@ public class ConsultaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_consulta);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         session = new SessionManager(getApplicationContext());
         conexion = new Conexion(getApplicationContext());
         session.firstRun();
@@ -490,24 +384,19 @@ public class ConsultaActivity extends AppCompatActivity {
         Button btnActivar = (Button) findViewById(R.id.boton_aceptar);
         Button btnNueva = (Button) findViewById(R.id.btnNueva);
         Button btnProducto = (Button) findViewById(R.id.btnProducto);
-        Button btnCiudad = (Button) findViewById(R.id.btnCiudad);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        mySpinner = (Spinner) findViewById(R.id.my_spinner);
         campo_imei = (EditText) findViewById(R.id.campo_imei);
         campo_iccid = (EditText) findViewById(R.id.campo_iccid);
         campo_codigo_ciudad = (EditText) findViewById(R.id.campo_ciudad);
         txtResultado = (TextView) findViewById(R.id.txtResultado);
-
-
         HashMap<String,String> mapaCrendenciales= session.getUserDetails();
-
         credencial.setClaveDistribuidor(mapaCrendenciales.get("distribuidor"));
         credencial.setClaveVendedor(mapaCrendenciales.get("vendedor"));
-
         txtClaveVendedor = (TextView) findViewById(R.id.txtClaveVendedor);
         txtClaveDistribuidor = (TextView) findViewById(R.id.txtClaveDistribuidor);
         txtClaveVendedor.setText(credencial.getClaveVendedor());
         txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
+        mensaje=new Mensaje(getApplicationContext());
         btnProducto.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -536,8 +425,8 @@ public class ConsultaActivity extends AppCompatActivity {
                     confirmaAcciones();
                }else{
 
-                    mostrarAlerta(ConsultaActivity.this, getString(R.string.error_titulo_conexion_nodisponible),
-                            getString(R.string.error_conexion_nodisponible), false);
+                    mensaje.getMostrarAlerta(ConsultaActivity.this, getString(R.string.error_titulo_conexion_nodisponible),
+                            getString(R.string.error_conexion_nodisponible),"OK");
                 }
 
                 //    txtResultado.setText("El numero es 222222222   ---" + tipoProducto.getNombre());
@@ -584,38 +473,32 @@ public class ConsultaActivity extends AppCompatActivity {
             @Override
             protected Boolean doInBackground(String... params) {
                 //   add = new UsuarioDAO().insert(usuario, fotoPerfil);
-                boolean valor = conexion.isAvailableWSDL(URL);
-                return valor ;
+                try {
+                    if (!conexion.isAvailableWSDL(Constantes.URL))
+                     //   Log.e("RVISOR MOBILE", "El WS " + Constantes.URL + " no esta en linea ");
+                        return false;
+
+                } catch (Exception e) {
+                    return false;
+                }
+                return true;
+
             }
 
             @Override
             protected void onPostExecute(Boolean result) {
                 // progress.dismiss();
                 if(!result){
-                    final AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
-                    alert.setTitle("Atención");
-                    alert.setMessage("El WS de catalogos no esta disponible \n"
-                            + "Favor de comunicarse con el area comercial\n");
-                    alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //  startActivity(new Intent(getApplicationContext(), ConsultaActivity.class));
-                           // finish();
-                           // startActivity(getIntent());
-                            dialog.dismiss();
-                        }
-                    });
-                    AlertDialog dialog = alert.create();
-                    dialog.show();
-                }else{
+
+                    mensaje.getMostrarAlerta(ConsultaActivity.this,"Atención",
+                            "El WS de catalogos no esta disponible \n"
+                                    + "Favor de comunicarse con el area comercial\n","OK");
 
                 }
             }
         }.execute("");
 
 
-        Spinner mySpinner = (Spinner) findViewById(R.id.my_spinner);
-        //  mySpinner.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, nombreProductos));
         coopelWS = new CoopelWS(getApplicationContext(), mySpinner,credencial.getClaveDistribuidor());
         coopelWS.execute();
 
@@ -638,7 +521,6 @@ public class ConsultaActivity extends AppCompatActivity {
     private void ScanEAN() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
         //intent.putExtra("SCAN_MODE", "PRODUCT_MODE");
-
         this.startActivityForResult(intent, 1);
     }
 
@@ -646,18 +528,15 @@ public class ConsultaActivity extends AppCompatActivity {
     private void ScanIccid() {
         Intent intent = new Intent("com.google.zxing.client.android.SCAN");
         //intent.putExtra("SCAN_MODE","PRODUCT_MODE");
-
         this.startActivityForResult(intent, 2);
     }
 
 
     private void limpiaPantalla() {
-
         campo_imei.setText(null);
         campo_iccid.setText(null);
         campo_codigo_ciudad.setText(null);
         txtResultado.setText(null);
-
     }
 
 
@@ -666,19 +545,6 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
-    private boolean isNumber(String word)
-    {
-        boolean isNumber = false;
-        try
-        {
-            Integer.parseInt(word);
-            isNumber = true;
-        } catch (NumberFormatException e)
-        {
-            isNumber = false;
-        }
-        return isNumber;
-    }
 
 
     @Override
@@ -693,105 +559,6 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
-    public void notification4(int id, int iconId, String titulo, String contenido,String telefono,String monto) {
-        notifyMgr = (NotificationManager) this
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-        // Estructura  la notificación
-/*
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(iconId).setLargeIcon(
-                        BitmapFactory.decodeResource(
-                                getResources(),
-                                R.drawable.ic_telefono
-
-                        ))
-
-                        .setContentTitle(telefono)
-                        .setContentText(monto)
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-        ;
-*/
-
-        Notification.Builder builder = new Notification.Builder(getApplicationContext());
-        Bitmap bm = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_bien);
-
-        builder
-                .setContentTitle(titulo)
-                .setContentText(contenido +" Telefono: "+telefono+" monto:"+monto)
-                .setContentInfo("mas informacion de la activacion")
-                .setSmallIcon(R.mipmap.ic_telefononube)
-                .setWhen(System.currentTimeMillis())
-                .setLargeIcon(bm)
-                .setTicker("Activacion exitosa");
-
-        ;
-        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
-        //.setLargeIcon(bitmapIcon);
-
-        new Notification.BigTextStyle(builder)
-                .bigText(contenido +" Telefono: "+telefono+" monto:"+monto)
-                .setBigContentTitle("Mensaje de Activacion")
-                .setSummaryText("Resultado de Activacion")
-                .build();
-
-
-        // Crear intent
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-
-// API 11 o mayor
-        builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
-        builder.setLights(Color.YELLOW, 300, 100);
-        //  builder.setVibrate(new long[] {0,100,200,300});
-
-        // Construir la notificación y emitirla
-        notifyMgr.notify(id, builder.build());
-    }
-
-    public void notificationError(int id, int iconId, String titulo, String contenido) {
-        notifyMgr = (NotificationManager) this
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-
-        Notification.Builder builder = new Notification.Builder(getApplicationContext());
-        Bitmap bm = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.mipmap.ic_mal);
-
-        builder
-                .setContentTitle(titulo)
-                .setContentText(contenido)
-                .setContentInfo("mas informacion de la activacion")
-                .setSmallIcon(R.mipmap.ic_telefononube)
-                .setWhen(System.currentTimeMillis())
-                .setLargeIcon(bm)
-                .setTicker("Error en la Activacion");
-
-        ;
-
-        //.setLargeIcon(bitmapIcon);
-
-        new Notification.BigTextStyle(builder)
-                .bigText(contenido)
-                .setBigContentTitle("Mensaje de Activacion")
-                .setSummaryText("Resultado de Activacion")
-                .build();
-
-
-        // Crear intent
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-
-// API 11 o mayor
-        builder.setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND | Notification.FLAG_SHOW_LIGHTS);
-        builder.setLights(Color.RED, 300, 100);
-        //  builder.setVibrate(new long[] {0,100,200,300});
-        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
-        // Construir la notificación y emitirla
-        notifyMgr.notify(id, builder.build());
-    }
 
 
 
@@ -840,21 +607,27 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
 
-    public void mostrarAlerta(Context context, String title, String message, Boolean status) {
+
+
+
+
+    public void mostrarAlertaExito(Context context, String title, String message,String titlePositiveButton) {
         AlertDialog.Builder alert = new AlertDialog.Builder(ConsultaActivity.this,R.style.myDialog);
         alert.setTitle(title);
         alert.setMessage(message+ "\n"
         );
-        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(titlePositiveButton, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-               // finish();
-               // startActivity(getIntent());
                 dialog.dismiss();
+                finish();
+                startActivity(getIntent());
+
             }
         });
         AlertDialog dialog = alert.create();
+        dialog.setCancelable(false);
         dialog.show();
     }
 

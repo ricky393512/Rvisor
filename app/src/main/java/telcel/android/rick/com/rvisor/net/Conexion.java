@@ -10,15 +10,17 @@ import org.ksoap2.SoapFault;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
-import telcel.android.rick.com.rvisor.pojo.Credencial;
+import telcel.android.rick.com.rvisor.pojo.RespuestaActivacion;
 import telcel.android.rick.com.rvisor.pojo.RespuestaLogueo;
+import telcel.android.rick.com.rvisor.pojo.TipoProducto;
 
 /**
  * Created by PIN7025 on 03/01/2017.
@@ -176,6 +178,25 @@ public class Conexion  {
 
     }
 
+
+
+
+    public RespuestaActivacion obtenerRespuestaActivaSoap(SoapObject soap) {
+        RespuestaActivacion respuestaActivacion = new RespuestaActivacion();
+        Log.i("TOTAL PROPIEDADES S: ", "" + soap.getPropertyCount());
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+            SoapObject pii = (SoapObject) soap.getProperty(i);
+            respuestaActivacion.setCodigo(Integer.parseInt(pii.getProperty(0).toString()));
+            respuestaActivacion.setMensaje(pii.getProperty(1).toString());
+            if(respuestaActivacion.getCodigo()==100) {
+                respuestaActivacion.setMonto(pii.getProperty(2).toString());
+                respuestaActivacion.setTelefono(pii.getProperty(3).toString());
+            }
+
+        }
+        return respuestaActivacion;
+    }
+
     public RespuestaLogueo obtenerCredencialesSoap(SoapObject soap) {
         RespuestaLogueo respuestaLogueo = new RespuestaLogueo();
 
@@ -201,5 +222,22 @@ public class Conexion  {
         }
         return categor*/
 
+    public List<TipoProducto> obtenerCatalogoProductoActivacionFromSoap(SoapObject soap) {
 
+        List<TipoProducto> listaProductos = new ArrayList<>();
+        TipoProducto[] productos = new TipoProducto[soap.getPropertyCount()];
+        for (int i = 0; i < productos.length; i++) {
+            SoapObject ic = (SoapObject) soap.getProperty(i);
+            TipoProducto tp = new TipoProducto();
+            //    Log.i("Debbbbb", "id  "+ic.getProperty(0).toString());
+            tp.setDescripcion(ic.getProperty(0).toString());
+            tp.setIdModalidad(Integer.parseInt(ic.getProperty(1).toString()));
+            tp.setIdProducto(Integer.parseInt(ic.getProperty(2).toString()));
+            productos[i] = tp;
+            listaProductos.add(tp);
+
+        }
+        return listaProductos;
+
+    }
 }
