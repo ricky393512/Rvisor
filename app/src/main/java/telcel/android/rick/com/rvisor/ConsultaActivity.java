@@ -17,7 +17,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -50,9 +52,11 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import telcel.android.rick.com.rvisor.almacenamiento.Almacen;
 import telcel.android.rick.com.rvisor.exceptions.WebServiceConexionException;
 import telcel.android.rick.com.rvisor.net.Conexion;
 import telcel.android.rick.com.rvisor.net.Constantes;
@@ -65,6 +69,11 @@ import telcel.android.rick.com.rvisor.session.SessionManager;
 import telcel.android.rick.com.rvisor.ws.CoopelWS;
 
 public class ConsultaActivity extends AppCompatActivity {
+    private String file_name_save;
+    private Calendar fechaActual = Calendar.getInstance();
+    private String FICHERO_DIR;
+    private static final int SOLICITA_PERMISO_STORAGE_CODE = 1;
+    private Almacen almacen;
     View focusView = null;
     EditText campo_imei;
     EditText campo_iccid;
@@ -398,6 +407,19 @@ public class ConsultaActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(ConsultaActivity.this, "Permission Denied!", Toast.LENGTH_SHORT).show();
                 }
+
+            case SOLICITA_PERMISO_STORAGE_CODE:
+                if (requestCode == SOLICITA_PERMISO_STORAGE_CODE) {
+                    if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        validate_external_permission();
+                    } else {
+                 //       Snackbar.make(vista, "Sin el permiso, no puedo realizar la" + "acción, Se define guardara en memoria interna", Snackbar.LENGTH_SHORT).show();
+                        System.out.println("El dossssssssssssssssssssss");
+                        almacen = new Almacen(this);
+
+                    }
+                }
+
         }
     }
     private void takePicture() {
@@ -441,9 +463,16 @@ public class ConsultaActivity extends AppCompatActivity {
         btnConsultar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println("Entroooooooo!");
+          /*      System.out.println("Entroooooooo!");
                 ActivityCompat.requestPermissions(ConsultaActivity.this, new
                         String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
+*/
+
+                file_name_save = "datos_escaneados.txt";
+                FICHERO_DIR = Environment.getExternalStorageDirectory() + "/" + file_name_save;
+                almacen = new Almacen(ConsultaActivity.this);
+                almacen.guardarinfoCSV(1.1, 1.1, 1.1,
+                        1.1, 1.1, FICHERO_DIR, 1.1,1.1);
 
             }
         });
@@ -534,7 +563,44 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    private void validate_external_permission() {
 
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            almacen = new Almacen(this);
+          //  permiso_Alma_OK = true;
+
+        } else {
+            request_premission_External();
+        }
+
+    }
+
+    public void request_premission_External() {
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            Snackbar.make(this.focusView, "Se requieren persmisos para grabar en Memoria Externa",
+                    Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Ok", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    ActivityCompat.requestPermissions(ConsultaActivity.this,
+                                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, SOLICITA_PERMISO_STORAGE_CODE);
+
+                                }
+                            }
+                    );
+
+
+        } else {
+            ActivityCompat.requestPermissions(ConsultaActivity.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, SOLICITA_PERMISO_STORAGE_CODE);
+
+        }
+    }
 
 
 
