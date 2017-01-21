@@ -39,6 +39,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/hint_distribuidor"
+                    android:digits="0123456789"
                     android:inputType="number"
                     android:maxLength="5"
                     android:singleLine="true"
@@ -64,6 +65,7 @@
                     android:hint="@string/hint_vendedor"
                     android:imeActionId="@+id/login"
                     android:inputType="number"
+                    android:digits="0123456789"
                     android:maxLength="5"
                     android:singleLine="true" />
 

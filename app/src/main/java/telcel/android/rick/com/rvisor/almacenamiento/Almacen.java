@@ -3,19 +3,13 @@ package telcel.android.rick.com.rvisor.almacenamiento;
 
 import android.content.Context;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Vector;
 
 
 /**
@@ -38,7 +32,7 @@ public class Almacen {
                 return;
             }else {
                 String texto = String.valueOf(time) + "," + String.valueOf(acelX) + "," + String.valueOf(acely) + ","+
-                        String.valueOf(latitude) + "," + String.valueOf(altitude) + "\n";
+                        String.valueOf(latitude) + "," + String.valueOf(altitude) + "\r\n";
              /*   FileOutputStream f = new FileOutputStream(fichero, true);
 
                 f.write(texto.getBytes());

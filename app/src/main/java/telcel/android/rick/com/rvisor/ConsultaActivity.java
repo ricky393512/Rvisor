@@ -460,20 +460,25 @@ public class ConsultaActivity extends AppCompatActivity {
         txtClaveDistribuidor.setText(credencial.getClaveDistribuidor());
         mensaje=new Mensaje(getApplicationContext());
 
+
         btnConsultar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-          /*      System.out.println("Entroooooooo!");
+               System.out.println("Entroooooooo!");
                 ActivityCompat.requestPermissions(ConsultaActivity.this, new
                         String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_PERMISSION);
-*/
 
-                file_name_save = "datos_escaneados.txt";
-                FICHERO_DIR = Environment.getExternalStorageDirectory() + "/" + file_name_save;
+
+           /*     file_name_save = "datos_escaneados.txt";
+
+                File sdDir = Environment.getExternalStorageDirectory();
+                Log.e("RVISOR","El pathhhhhhhhhhhhh Absolute 1 ->"+sdDir.getAbsolutePath());
+                //FICHERO_DIR = sdDir.getAbsolutePath()+ "/" + file_name_save;
+                FICHERO_DIR = Environment.getExternalStorageDirectory()+ "/" + file_name_save;
                 almacen = new Almacen(ConsultaActivity.this);
-                almacen.guardarinfoCSV(1.1, 1.1, 1.1,
+                almacen.guardarinfoCSV(2.1, 1.1, 1.1,
                         1.1, 1.1, FICHERO_DIR, 1.1,1.1);
-
+*/
             }
         });
 
@@ -484,12 +489,12 @@ public class ConsultaActivity extends AppCompatActivity {
 
 
         detector = new BarcodeDetector.Builder(getApplicationContext())
-                .setBarcodeFormats(Barcode.DATA_MATRIX | Barcode.QR_CODE)
+                .setBarcodeFormats(Barcode.CODE_128|Barcode.CODE_39|Barcode.CODE_39|Barcode.EAN_8)
                 .build();
-        if (!detector.isOperational()) {
+        /*if (!detector.isOperational()) {
             campo_iccid.setText("Could not set up the detector!");
             return;
-        }
+        }*/
 
 
 
@@ -683,7 +688,37 @@ public class ConsultaActivity extends AppCompatActivity {
     }
 
 
+    /*
+    public void processBarcode(View view) {
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(this)
+                .setBarcodeFormats(Barcode.ALL_FORMATS)
+                .build();
 
+        if (!barcodeDetector.isOperational()) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Barcode detector could not be set up on your device :(")
+                    .show();
+        } else {
+            Frame frame = new Frame.Builder().setBitmap(barcodeBitmap).build();
+            SparseArray<Barcode> barcode = barcodeDetector.detect(frame);
+
+            int size = barcode.size();
+            String barcodeValue = "";
+
+            if (size == 0) {
+              textView.setText("No information available");
+            } else {
+                for (int i = 0; i < size; i++) {
+                    barcodeValue += (barcode.valueAt(i).displayValue + "\n");
+                }
+               textView.setText(barcodeValue);
+            }
+        }
+
+        barcodeDetector.release();
+    }
+
+*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -694,17 +729,29 @@ public class ConsultaActivity extends AppCompatActivity {
             else if (requestCode == 2)
                 campo_iccid.setText(data.getStringExtra("SCAN_RESULT"));
             else if (requestCode == 3){
+                Log.e("RVISOR","3333entro");
+                detector = new BarcodeDetector.Builder(this)
+                        .setBarcodeFormats(Barcode.ALL_FORMATS)
+                        .build();
 
+               /* if (!detector.isOperational()) {
+                    campo_iccid.setText("Could not set up the detector!");
+                    return;
+                }
+*/
+
+                Log.e("RVISOR","Image "+imageUri.getPath());
 
                 launchMediaScanIntent();
                 try {
                     Bitmap bitmap = decodeBitmapUri(this, imageUri);
-                    if (detector.isOperational() && bitmap != null) {
+                 //   if (detector.isOperational() && bitmap != null) {
                         Frame frame = new Frame.Builder().setBitmap(bitmap).build();
                         SparseArray<Barcode> barcodes = detector.detect(frame);
                         for (int index = 0; index < barcodes.size(); index++) {
                             Barcode code = barcodes.valueAt(index);
                             campo_iccid.setText(campo_iccid.getText() + code.displayValue + "\n");
+                            Log.e("RVISOR","Image "+campo_iccid.getText() + code.displayValue + "\n");
 
                             //Required only if you need to extract the type of barcode
                             int type = barcodes.valueAt(index).valueFormat;
@@ -751,10 +798,11 @@ public class ConsultaActivity extends AppCompatActivity {
                             }
                         }
                         if (barcodes.size() == 0) {
-                            campo_iccid.setText("Scan Failed: Found nothing to scan");
+                          //  campo_iccid.setText("Scan Failed: Found nothing to scan");
                         }
-                    } else {
-                        campo_iccid.setText("Could not set up the detector!");
+                //    }
+                else {
+                       // campo_iccid.setText("Could not set up the detector!");
                     }
                 } catch (Exception e) {
                     Toast.makeText(this, "Failed to load Image", Toast.LENGTH_SHORT)
@@ -786,6 +834,7 @@ public class ConsultaActivity extends AppCompatActivity {
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
 
+        Log.e("RVISOR","regreso");
         return BitmapFactory.decodeStream(ctx.getContentResolver()
                 .openInputStream(uri), null, bmOptions);
     }
